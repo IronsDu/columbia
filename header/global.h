@@ -83,7 +83,7 @@ CLASS_STAT ClassStat[] =	// class statistics object
 		CLASS_STAT("FILTER",sizeof(class FILTER) ),
 		CLASS_STAT("FUNC_OP",sizeof(class FUNC_OP) ),
 		CLASS_STAT("GET",sizeof(class GET) ),
-		CLASS_STAT("GROUP",sizeof(class GROUP) ),
+		CLASS_STAT("GROUP",sizeof(class EXP_GROUP) ),
 		CLASS_STAT("HASH_DUPLICATES",sizeof(class HASH_DUPLICATES) ),
 		CLASS_STAT("HGROUP_LIST", sizeof(class HGROUP_LIST) ),
 		CLASS_STAT("INDEXED_FILTER", sizeof(class INDEXED_FILTER) ),

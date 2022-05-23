@@ -1032,7 +1032,7 @@ EXPR * EQJOIN_LTOR::next_substitute (EXPR * before,PHYS_PROP * ReqdProp)
     EXPR * AB = before->GetInput(0);
 	LEAF_OP * B = (LEAF_OP *) ( AB->GetInput(1)->GetOp() );
     GRP_ID group_no = B->GetGroup();
-    GROUP * group = Ssp->GetGroup(group_no);
+    EXP_GROUP * group = Ssp->GetGroup(group_no);
     SCHEMA *Bs_schema = ((LOG_COLL_PROP *)(group->get_log_prop())) ->Schema;
 	
     // See where second join predicates of antecedent go
@@ -1260,7 +1260,7 @@ EXPR * EQJOIN_LTOR::next_substitute (EXPR * before,PHYS_PROP * ReqdProp)
 	  EXPR * BC = before->GetInput(1);
 	  LEAF_OP * B = (LEAF_OP *) (BC->GetInput(0) -> GetOp());
 	  GRP_ID group_no = B->GetGroup();
-	  GROUP * group = Ssp->GetGroup(group_no);
+	  EXP_GROUP * group = Ssp->GetGroup(group_no);
 	  LOG_PROP * LogProp = group->get_log_prop();	
 	  SCHEMA *Bs_schema = ((LOG_COLL_PROP *)LogProp) ->Schema;
 	  
@@ -1511,7 +1511,7 @@ EXPR * EQJOIN_LTOR::next_substitute (EXPR * before,PHYS_PROP * ReqdProp)
 		EXPR * AB = before->GetInput(0);
 		LEAF_OP * AA = (LEAF_OP *) AB->GetInput(0)->GetOp() ;
 		GRP_ID  group_no = AA->GetGroup();
-		GROUP * group = Ssp->GetGroup(group_no);
+		EXP_GROUP * group = Ssp->GetGroup(group_no);
 		LOG_PROP * log_prop = group->get_log_prop();	
 		SCHEMA *AAA = ((LOG_COLL_PROP *)log_prop) ->Schema;
 		
@@ -1797,7 +1797,7 @@ EXPR * EQJOIN_LTOR::next_substitute (EXPR * before,PHYS_PROP * ReqdProp)
 	  // Get input's schema
 	  LEAF_OP * A = (LEAF_OP *) ( before->GetInput(0)->GetOp() );
 	  GRP_ID group_no = A->GetGroup();
-	  GROUP* group = Ssp->GetGroup(group_no);
+	  EXP_GROUP* group = Ssp->GetGroup(group_no);
 	  LOG_PROP * LogProp = group->get_log_prop();
 	  SCHEMA *As_schema = ((LOG_COLL_PROP *)LogProp) ->Schema;
 	  
@@ -2020,7 +2020,7 @@ EXPR * EQJOIN_LTOR::next_substitute (EXPR * before,PHYS_PROP * ReqdProp)
 	  //get the schema of the right input
 	  LEAF_OP * r_op = (LEAF_OP *) before->GetInput(0)->GetInput(1)->GetOp();
 	  GRP_ID r_gid = r_op->GetGroup();
-	  GROUP * r_group = Ssp->GetGroup(r_gid);
+	  EXP_GROUP * r_group = Ssp->GetGroup(r_gid);
 	  LOG_COLL_PROP * r_prop = (LOG_COLL_PROP *) r_group->get_log_prop();
 	  SCHEMA * right_schema = r_prop->Schema;
 	  
@@ -2077,13 +2077,13 @@ EXPR * EQJOIN_LTOR::next_substitute (EXPR * before,PHYS_PROP * ReqdProp)
 	  //get the schema of the right input
 	  LEAF_OP * r_op = (LEAF_OP *) before->GetInput(0)->GetInput(1)->GetOp();
 	  GRP_ID r_gid = r_op->GetGroup();
-	  GROUP * r_group = Ssp->GetGroup(r_gid);
+	  EXP_GROUP * r_group = Ssp->GetGroup(r_gid);
 	  LOG_COLL_PROP * r_prop = (LOG_COLL_PROP *) r_group->get_log_prop();
 	  SCHEMA * right_schema = r_prop->Schema;
 	  //get candidatekey of the left input
 	  LEAF_OP * l_op = (LEAF_OP *) before->GetInput(0)->GetInput(0)->GetOp();
 	  GRP_ID l_gid = l_op->GetGroup();
-	  GROUP * l_group = Ssp->GetGroup(l_gid);
+	  EXP_GROUP * l_group = Ssp->GetGroup(l_gid);
 	  LOG_COLL_PROP * l_prop = (LOG_COLL_PROP *) l_group->get_log_prop();
 	  KEYS_SET * l_cand_key = l_prop->CandidateKey;
 	  
@@ -2186,7 +2186,7 @@ EXPR * EQJOIN_LTOR::next_substitute (EXPR * before,PHYS_PROP * ReqdProp)
 	  // Get schema for LEAF(0)
 	  LEAF_OP * LEAF0 = (LEAF_OP *) (before->GetInput(0)->GetOp());
 	  GRP_ID group_no = LEAF0->GetGroup();
-	  GROUP * group = Ssp->GetGroup(group_no);
+	  EXP_GROUP * group = Ssp->GetGroup(group_no);
 	  LOG_PROP * LogProp = group->get_log_prop();	
 	  KEYS_SET * l_cand_key = ((LOG_COLL_PROP *)LogProp) ->CandidateKey;
 	  
@@ -2202,7 +2202,7 @@ EXPR * EQJOIN_LTOR::next_substitute (EXPR * before,PHYS_PROP * ReqdProp)
 	  //Get is the predicate of SELECT
 	  LEAF_OP * PredOp = (LEAF_OP *) before->GetInput(1)->GetInput(1)->GetOp();
 	  GRP_ID Pred_GID = PredOp->GetGroup();
-	  GROUP * leaf_group = Ssp->GetGroup(Pred_GID);
+	  EXP_GROUP * leaf_group = Ssp->GetGroup(Pred_GID);
 	  LOG_PROP * leaf_prop = leaf_group->get_log_prop();
 	  KEYS_SET pred_freevar = ((LOG_ITEM_PROP *)leaf_prop)->FreeVars;
 	  
@@ -2287,7 +2287,7 @@ EXPR * EQJOIN_LTOR::next_substitute (EXPR * before,PHYS_PROP * ReqdProp)
 	  //get the predicate free variables
 	  LEAF_OP * Pred = (LEAF_OP *) (before->GetInput(1)->GetOp());
 	  GRP_ID GrpNo = Pred->GetGroup();
-	  GROUP * PredGrp = Ssp->GetGroup(GrpNo);
+	  EXP_GROUP * PredGrp = Ssp->GetGroup(GrpNo);
 	  LOG_PROP * log_prop = PredGrp->get_log_prop();
 	  KEYS_SET FreeVar = ((LOG_ITEM_PROP *)log_prop)->FreeVars;
 	  
@@ -2345,7 +2345,7 @@ EXPR * EQJOIN_LTOR::next_substitute (EXPR * before,PHYS_PROP * ReqdProp)
 	  // Get the select predicate free variables spfv
 	  LEAF_OP * Pred = (LEAF_OP *) (before->GetInput(0)->GetInput(1)->GetOp());
 	  GRP_ID GrpNo = Pred->GetGroup();
-	  GROUP * PredGrp = Ssp->GetGroup(GrpNo);
+	  EXP_GROUP * PredGrp = Ssp->GetGroup(GrpNo);
 	  LOG_PROP * log_prop = PredGrp->get_log_prop();
 	  KEYS_SET FreeVar = ((LOG_ITEM_PROP *)log_prop)->FreeVars;
 	  

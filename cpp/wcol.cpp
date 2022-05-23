@@ -114,7 +114,7 @@ BOOL CWcolApp::InitInstance()
 	AppDir = buffer;
 	
 	CString OptionFile = AppDir + "\\option";
-	ifstream fin(OptionFile.GetBuffer(OptionFile.GetLength()), ios::nocreate);
+	std::ifstream fin(OptionFile.GetBuffer(OptionFile.GetLength()), std::ios::_Nocreate);
 	
 	// read in last option
 	char TextLine[LINELENGTH];

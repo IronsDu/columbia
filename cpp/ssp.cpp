@@ -88,7 +88,7 @@ CString SSP::DumpHashTable()
 CString SSP::DumpChanged()
 {
     CString os;
-    GROUP* Group;
+    EXP_GROUP* Group;
     
 	for(int i=0; i< Groups.GetSize();i++)
 		if(Groups[i]->is_changed()) 
@@ -111,7 +111,7 @@ void SSP::Shrink()
 //##ModelId=3B0C086500B9
 void SSP::ShrinkGroup(GRP_ID group_no)
 {
-    GROUP* Group;
+    EXP_GROUP* Group;
     M_EXPR * mexpr;
     M_EXPR * p;
     M_EXPR * prev;
@@ -189,7 +189,7 @@ void SSP::ShrinkGroup(GRP_ID group_no)
 CString SSP::Dump()
 {
     CString os;
-    GROUP* Group;
+    EXP_GROUP* Group;
     
 	os.Format("%s%d%s","RootGID:" , RootGID , "\r\n");
     
@@ -309,7 +309,7 @@ GRP_ID SSP::MergeGroups(GRP_ID group_no1, GRP_ID group_no2)
 //##ModelId=3B0C08650069
 M_EXPR*	SSP::CopyIn(EXPR * Expr, GRP_ID& GrpID)
 {
-	GROUP *	Group ;
+	EXP_GROUP *	Group ;
 	bool win = true;	//will we initialize nontrivial winners in this group?
 	//False if it is a subgroup of a DUMMY operator
     
@@ -368,7 +368,7 @@ M_EXPR*	SSP::CopyIn(EXPR * Expr, GRP_ID& GrpID)
 	if(GrpID == NEW_GRPID)
 	{
 		// create a new group
-		Group = new GROUP( MExpr );
+		Group = new EXP_GROUP( MExpr );
 		
 		// insert the new group into ssp
 		GrpID = Group->GetGroupID();
@@ -431,7 +431,7 @@ M_EXPR*	SSP::CopyIn(EXPR * Expr, GRP_ID& GrpID)
     { 
 		//Find the winner for this Physical Property.
 		//print the Winner's Operator and cost
-		GROUP * ThisGroup = Ssp -> GetGroup(GrpID);
+		EXP_GROUP * ThisGroup = Ssp -> GetGroup(GrpID);
 		
 #ifndef IRPROP
 		WINNER * ThisWinner;
@@ -674,7 +674,7 @@ M_EXPR*	SSP::CopyIn(EXPR * Expr, GRP_ID& GrpID)
 
     */
 //##ModelId=3B0C0867008B
-    bool GROUP::search_circle(CONT * C, bool & moreSearch)
+    bool EXP_GROUP::search_circle(CONT * C, bool & moreSearch)
     {
 		//First search for a winner with property P.
 		WINNER * Winner = GetWinner(C -> GetPhysProp());
@@ -724,7 +724,7 @@ M_EXPR*	SSP::CopyIn(EXPR * Expr, GRP_ID& GrpID)
     }
     
 //##ModelId=3B0C086700A7
-    WINNER * GROUP::GetWinner(PHYS_PROP * PhysProp)
+    WINNER * EXP_GROUP::GetWinner(PHYS_PROP * PhysProp)
     {
 		int Size = Winners.GetSize();
         for(int i = 0; i<Size; i++)
@@ -740,7 +740,7 @@ M_EXPR*	SSP::CopyIn(EXPR * Expr, GRP_ID& GrpID)
     } // GROUP::GetWinner
     
 //##ModelId=3B0C086700B1
-    void GROUP::NewWinner(PHYS_PROP * ReqdProp, M_EXPR * MExpr, COST * TotalCost, 
+    void EXP_GROUP::NewWinner(PHYS_PROP * ReqdProp, M_EXPR * MExpr, COST * TotalCost, 
 		bool done)
     {
 		if(COVETrace && MExpr)	//New Winner
@@ -755,7 +755,7 @@ M_EXPR*	SSP::CopyIn(EXPR * Expr, GRP_ID& GrpID)
 			
 		}
 		
-		this -> set_changed(true);
+		this->set_changed(true);
 		
 		//Seek winner with property ReqdProp in the winner's circle
         for(int i = Winners.GetSize(); --i>=0;)
@@ -776,7 +776,7 @@ M_EXPR*	SSP::CopyIn(EXPR * Expr, GRP_ID& GrpID)
     }
     
 //##ModelId=3B0C086700C6
-    bool GROUP::CheckWinnerDone()
+    bool EXP_GROUP::CheckWinnerDone()
     {
 		//Search Winner's circle.  If there is a winner done, return true
 		

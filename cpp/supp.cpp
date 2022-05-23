@@ -13,6 +13,7 @@ supp.cpp -  implementation of supplement classes
 	
 */
 
+#include <string.h>
 #include "stdafx.h"
 #include "cat.h"
 #include "item.h"
@@ -66,7 +67,7 @@ ub4 lookup2(
 	len = length;
 	a = b = 0x9e3779b9;  /* the golden ratio; an arbitrary value */
 	c = initval;         /* the previous hash value */
-	register i = 0;		// How many bytes of k have we processed so far?
+	int i = 0;		// How many bytes of k have we processed so far?
 	
 	/*---------------------------------------- handle most of the key */
 	while (len >= 12)
@@ -481,12 +482,15 @@ bool    SCHEMA::AddAttr(int Index, ATTR *attr)
 //##ModelId=3B0C08620033
 bool SCHEMA::InSchema(int AttId)
 {
-	for(int i=0;i<Size; i++)
-		if( AttId==Attrs[i]->AttId )
+	int i = 0;
+	for (; i < Size; i++)
+	{
+		if (AttId == Attrs[i]->AttId)
 			break;
+	}
 		
-		if(i<Size) return true;
-		else return false;
+	if (i < Size) return true;
+	else return false;
 }
 
 // max cucard of each tables in the schema
@@ -532,7 +536,8 @@ SCHEMA * SCHEMA::projection( int * attrs, int size)
     //add attribute sets from left operand
     for (int i = 0;  i < size;  i++)
     {
-		for(int index=0; index < this->Size; index++)
+		int index = 0;
+		for(; index < this->Size; index++)
 		{
 			if ( attrs[i] == this->Attrs[index]->AttId )  
 			{
@@ -725,13 +730,16 @@ int GetCollId(int AttId)
 int GetCollId(CString CollName)
 {
 	int Size = CollTable.GetSize();
-	for(int i=0; i < Size; i++)
-		if( CollName == CollTable[i] ) break;
+	int i = 0;
+	for (; i < Size; i++)
+	{
+		if (CollName == CollTable[i]) break;
+	}
 		
-		if(i == Size) 
-			CollTable.Add(CollName);
-		
-		return i;	
+	if (i == Size)
+		CollTable.Add(CollName);
+
+	return i;
 }
 
 // Get Att id from name, using AttTable dictionary
@@ -742,7 +750,8 @@ int GetAttId(CString CollName, CString AttName)
 	
 	CString Name = CollName + "." + AttName; 
 	int Size = AttTable.GetSize();
-	for(int i=0; i < Size; i++)
+	int i = 0;
+	for(; i < Size; i++)
 	{
 		if( Name == AttTable[i] ) break;
 	}
@@ -762,17 +771,20 @@ int GetAttId(CString Name)
 	assert(pos!= -1);
 	
 	int Size = AttTable.GetSize();
-	for(int i=0; i < Size; i++)
-		if( Name == AttTable[i] ) break;
+	int i = 0;
+	for (; i < Size; i++)
+	{
+		if (Name == AttTable[i]) break;
+	}
 		
-		if(i == Size) // the entry not exist, new it
-		{
-			AttTable.Add(Name);
-			CString CollName = Name.Left(pos);
-			AttCollTable.Add( GetCollId(CollName) ) ;
-		}
-		
-		return i;	
+	if (i == Size) // the entry not exist, new it
+	{
+		AttTable.Add(Name);
+		CString CollName = Name.Left(pos);
+		AttCollTable.Add(GetCollId(CollName));
+	}
+
+	return i;
 }
 
 // Get the ids from names
@@ -780,13 +792,16 @@ int GetIndId(CString CollName, CString IndName)
 {
 	CString Name = CollName + "." + IndName; 
 	int Size = IndTable.GetSize();
-	for(int i=0; i < Size; i++)
-		if( Name == IndTable[i] ) break;
+	int i = 0;
+	for (; i < Size; i++)
+	{
+		if (Name == IndTable[i]) break;
+	}
 		
-		if(i == Size) // the entry not exist, new it
-			IndTable.Add(Name);
-		
-		return i;	
+	if (i == Size) // the entry not exist, new it
+		IndTable.Add(Name);
+
+	return i;
 }
 
 // Get the ids from names
@@ -794,13 +809,16 @@ int GetBitIndId(CString CollName, CString BitIndName)
 {
 	CString Name = CollName + "." + BitIndName; 
 	int Size = BitIndTable.GetSize();
-	for(int i=0; i < Size; i++)
-		if( Name == BitIndTable[i] ) break;
+	int i = 0;
+	for (; i < Size; i++)
+	{
+		if (Name == BitIndTable[i]) break;
+	}
 		
-		if(i == Size) // the entry not exist, new it
-			BitIndTable.Add(Name);
-		
-		return i;	
+	if (i == Size) // the entry not exist, new it
+		BitIndTable.Add(Name);
+
+	return i;
 }
 
 // Get the names from Ids
@@ -821,7 +839,7 @@ CString GetAttName(int AttId)
 //Transform A.B to B
 CString TruncName(CString AttName)
 {
-	char *p = strstr(AttName, ".");
+	char *p = strstr((char*)(AttName.GetString()), ".");
 	assert(p);  //Input was not of the form A.B
 	p++; //skip over .
 	return p;

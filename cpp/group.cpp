@@ -20,7 +20,7 @@ group.cpp -  implementation of class GROUP
 #endif
 
 //##ModelId=3B0C086603C7
-GROUP::GROUP(M_EXPR * MExpr)
+EXP_GROUP::EXP_GROUP(M_EXPR * MExpr)
 :GroupID(MExpr->GetGrpID()), 
 FirstLogMExpr(MExpr), LastLogMExpr(MExpr), 
 FirstPhysMExpr(NULL), LastPhysMExpr(NULL)
@@ -38,7 +38,7 @@ FirstPhysMExpr(NULL), LastPhysMExpr(NULL)
 	else
 	{
 		InputProp = new LOG_PROP* [arity];
-		GROUP *Group;
+		EXP_GROUP *Group;
 		for(int i=0; i<arity; i++)
 		{	
 			Group = Ssp->GetGroup(MExpr->GetInput(i));
@@ -109,7 +109,7 @@ FirstPhysMExpr(NULL), LastPhysMExpr(NULL)
 
 // free up memory
 //##ModelId=3B0C086603C9
-GROUP::~GROUP()
+EXP_GROUP::~EXP_GROUP()
 {
 	if (!ForGlobalEpsPruning) ClassStat[C_GROUP].Delete();
 	
@@ -141,11 +141,11 @@ GROUP::~GROUP()
 
 // estimate the number of tables in EQJOIN
 //##ModelId=3B0C086701FC
-int  GROUP::EstimateNumTables(M_EXPR * MExpr)
+int  EXP_GROUP::EstimateNumTables(M_EXPR * MExpr)
 {
 	int table_num;
 	int total=0;
-	GROUP *Group;
+	EXP_GROUP *Group;
 	int arity = MExpr->GetArity();
 	// if the input is EQJOIN, continue to count all the input
 	for(int i=0; i<arity; i++)
@@ -162,7 +162,7 @@ int  GROUP::EstimateNumTables(M_EXPR * MExpr)
 }
 
 //##ModelId=3B0C08670089
-void GROUP::NewMExpr(M_EXPR *MExpr) 
+void EXP_GROUP::NewMExpr(M_EXPR *MExpr) 
 {
 	// link to last mexpr
 	if(MExpr->GetOp()->is_logical())
@@ -208,7 +208,7 @@ void GROUP::NewMExpr(M_EXPR *MExpr)
 }  
 
 //##ModelId=3B0C08670044
-void GROUP::set_optimized (bool is_optimized) 
+void EXP_GROUP::set_optimized (bool is_optimized) 
 { 
 	SET_TRACE Trace(true);
 	
@@ -222,7 +222,7 @@ void GROUP::set_optimized (bool is_optimized)
 }
 
 //##ModelId=3B0C086700BC
-void GROUP::ShrinkSubGroup()
+void EXP_GROUP::ShrinkSubGroup()
 {
 	for(M_EXPR * MExpr = FirstLogMExpr; 
 		MExpr!=NULL; 
@@ -235,7 +235,7 @@ void GROUP::ShrinkSubGroup()
 
 // Delete a physical MExpr from a group, save memory
 //##ModelId=3B0C086700BD
-void GROUP::DeletePhysMExpr (M_EXPR * PhysMExpr)
+void EXP_GROUP::DeletePhysMExpr (M_EXPR * PhysMExpr)
 {
 	M_EXPR * MExpr = FirstPhysMExpr;
 	M_EXPR *next;
@@ -271,7 +271,7 @@ void GROUP::DeletePhysMExpr (M_EXPR * PhysMExpr)
 } 
 
 //##ModelId=3B0C086603D1
-CString GROUP::Dump()
+CString EXP_GROUP::Dump()
 {
 	CString os;
 	int Size = 0;
@@ -331,7 +331,7 @@ CString GROUP::Dump()
 }
 
 //##ModelId=3B0C086603D2
-void GROUP::FastDump()
+void EXP_GROUP::FastDump()
 {
 	int Size = 0;
 	M_EXPR* MExpr;

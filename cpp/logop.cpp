@@ -53,7 +53,8 @@ GET::GET ( CString collection,  CString rangeVar)
 		INT_ARRAY* AttArray = Cat -> GetAttNames(collectionID);
 		int Size = AttArray -> GetSize();
 		ATTR * attr;
-		for (int i = 0 ; i < Size; i++)  //For each attribute
+		int i = 0;
+		for ( ; i < Size; i++)  //For each attribute
 		{
 			attr = new ATTR(* (Cat -> GetAttr(AttArray -> GetAt(i)) ) );
 			DOM_TYPE domain = Cat->GetDomain(AttArray->GetAt(i));
@@ -676,7 +677,8 @@ LOG_PROP* SELECT::FindLogProp (LOG_PROP ** input)
     SCHEMA * new_schema = new SCHEMA(*(rel_input -> Schema));
     
     new_card = ceil(rel_input -> Card * sel);
-    for (int i=0; i<new_schema->GetSize(); i++) 
+	int i = 0;
+    for (; i<new_schema->GetSize(); i++) 
 	{
 		old_cucard = (*new_schema)[i] -> CuCard;
 		if (old_cucard!=-1) 

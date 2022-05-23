@@ -24,7 +24,8 @@
 #include "time.h"
 #include <sys/timeb.h>
 #include <direct.h>
-#include <fstream.h>
+#include <fstream>
+#include <istream>
 
 #include "wcol.h"
 #include "defs.h"

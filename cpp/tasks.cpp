@@ -202,7 +202,7 @@ void O_GROUP::perform ()
 #endif
 	PTRACE ("Last flag is %d", Last);
     
-	GROUP * Group = Ssp->GetGroup(GrpID);
+	EXP_GROUP * Group = Ssp->GetGroup(GrpID);
 	M_EXPR * FirstLogMExpr = Group->GetFirstLogMExpr();
 	
 	if (FirstLogMExpr->GetOp()->is_const())
@@ -448,7 +448,7 @@ void O_GROUP::perform ()
 		PTRACE("E_GROUP %d performing", GrpID);
 		PTRACE2 ("Context ID: %d , %s", ContextID, CONT::vc[ContextID]->Dump() );
 		
-		GROUP * Group = Ssp->GetGroup(GrpID);
+		EXP_GROUP * Group = Ssp->GetGroup(GrpID);
 		
 		if (Group -> is_optimized())   //See discussion in E_GROUP class declaration
 		{
@@ -815,7 +815,7 @@ void O_INPUTS::perform ()
 	
 	OP * Op = MExpr ->GetOp();  //the op of the expr
 	assert(Op -> is_physical() );
-	GROUP *	LocalGroup = Ssp -> GetGroup(MExpr -> GetGrpID());	//Group of the MExpr
+	EXP_GROUP *	LocalGroup = Ssp -> GetGroup(MExpr -> GetGrpID());	//Group of the MExpr
     
 #ifdef IRPROP
 	PHYS_PROP * LocalReqdProp = M_WINNER::mc[GrpNo]->GetPhysProp(ContextID);
@@ -839,7 +839,7 @@ void O_INPUTS::perform ()
     
 	//Declare locals
 	GRP_ID IGNo;	//Input Group Number
-	GROUP * IG;
+	EXP_GROUP * IG;
 	int input;		//index over input groups
 	bool possible;	// is it possible to satisfy the required property?
     //	COST * CostSoFar = new COST(0);
@@ -857,7 +857,7 @@ void O_INPUTS::perform ()
 		// init inputLogProp
 		for(input= 0; input< arity; input++)
 		{
-			GROUP * InputGroup = Ssp -> GetGroup(MExpr -> GetInput(input));  //Group of current input
+			EXP_GROUP * InputGroup = Ssp -> GetGroup(MExpr -> GetInput(input));  //Group of current input
 			InputLogProp[input] = InputGroup -> get_log_prop() ;
 		}
 		
@@ -1476,7 +1476,7 @@ TerminateThisTask :
     {
 		if(Last)
 		{
-			GROUP * Group = Ssp->GetGroup(MExpr->GetGrpID());
+			EXP_GROUP * Group = Ssp->GetGroup(MExpr->GetGrpID());
 			if(!explore)
 			{
 #ifndef IRPROP

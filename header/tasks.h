@@ -303,7 +303,7 @@ public :
 		if(Last)
 		{
 			
-			GROUP * Group = Ssp->GetGroup(MExpr->GetGrpID());
+			EXP_GROUP * Group = Ssp->GetGroup(MExpr->GetGrpID());
 			if (!explore)
 			{
 #ifndef IRPROP

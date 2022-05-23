@@ -19,7 +19,7 @@ Columbia Optimizer Framework
 #define NEW_GRPID_NOWIN	-2	// use by SSP::CopyIn.  Means NEW_GRPID, and this is a
 // subgroup of DUMMY so don't init nontrivial winners
 class SSP;
-class GROUP;
+class EXP_GROUP;
 class M_EXPR;
 class WINNER;
 class M_WINNER;
@@ -97,7 +97,7 @@ public:
 	
 	// return the specific group
 	//##ModelId=3B0C0865009A
-	inline GROUP *	GetGroup(GRP_ID Gid) { return Groups[Gid]; } ;	
+	inline EXP_GROUP *	GetGroup(GRP_ID Gid) { return Groups[Gid]; } ;	
 	
 	//If another expression in the search space is identical to MExpr, return 
 	// it, else return NULL. 
@@ -140,7 +140,7 @@ private:
 	
     //Collection of Groups, indexed by GRP_ID
 	//##ModelId=3B0C0865013C
-    CArray<GROUP*, GROUP* > Groups;
+    CArray<EXP_GROUP*, EXP_GROUP* > Groups;
 	
 }; // class SSP
 
@@ -322,15 +322,15 @@ struct BIT_STATE
 };
 			   
 //##ModelId=3B0C086603B3
-class GROUP      
+class EXP_GROUP      
 {
 	
 public:
 	
 	//##ModelId=3B0C086603C7
-	GROUP(M_EXPR * MExpr); //Create a new Group containing just this MExpression
+	EXP_GROUP(M_EXPR * MExpr); //Create a new Group containing just this MExpression
 	//##ModelId=3B0C086603C9
-	~GROUP();
+	~EXP_GROUP();
 	
 	//##ModelId=3B0C086603D1
 	CString Dump();

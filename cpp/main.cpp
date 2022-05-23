@@ -171,6 +171,7 @@ void Optimizer()
 		
 		//For each query numbered q
 		bool first = true; //treat the first "Query: n" specially
+		int i = 0;
 		for (int q = 0; q < NumQuery; q++)
 		{
 			if (RadioVal == 0)	//Batch case
@@ -186,7 +187,7 @@ void Optimizer()
 				
 #endif
 				
-				for(int i=0; i < CLASS_NUM; i++)
+				for(; i < CLASS_NUM; i++)
 					ClassStat[i].Count = ClassStat[i].Max = ClassStat[i].Total = 0;
 				OptStat->DupMExpr  = OptStat->FiredRule  = OptStat->HashedMExpr = 0;
 				OptStat->MaxBucket = OptStat->TotalMExpr = 0;

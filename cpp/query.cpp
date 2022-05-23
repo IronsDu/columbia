@@ -174,7 +174,7 @@ EXPR * QUERY::ParseExpr(char *&ExprStr)
 {
 	EXPR *LeftExpr, *RightExpr;
 	EXPR *Expr;
-	OP	 *Op;
+	Operator	 *Op;
 	char *p;
 	char *OneElement;
 	
@@ -199,7 +199,7 @@ EXPR * QUERY::ParseExpr(char *&ExprStr)
 		ParsePJKeys(p, KeysSet);
 		free(OneElement);
 		
-		Op = new PROJECT( KeysSet.CopyOut(), KeysSet.GetSize());
+		Op = new ProjectLogicalOperator( KeysSet.CopyOut(), KeysSet.GetSize());
 		
 		return new EXPR(Op, Expr);
 	}
@@ -211,7 +211,7 @@ EXPR * QUERY::ParseExpr(char *&ExprStr)
 		
 		free(OneElement);
 		
-		Op = new SELECT;
+		Op = new SelectLogicalOperator;
 		
 		return new EXPR(Op, LeftExpr, RightExpr);
 	}
@@ -229,7 +229,7 @@ EXPR * QUERY::ParseExpr(char *&ExprStr)
 		
 		int Size = LeftKeysSet.GetSize();
 		assert(Size == RightKeysSet.GetSize() );
-		Op = new EQJOIN( LeftKeysSet.CopyOut(), RightKeysSet.CopyOut(), Size );
+		Op = new EQJoinLogicalOperator( LeftKeysSet.CopyOut(), RightKeysSet.CopyOut(), Size );
 		
 		// if the eqjoin is on multiattribute, choose those attributes that have max CuCard
 		if (Size > 1)
@@ -260,7 +260,7 @@ EXPR * QUERY::ParseExpr(char *&ExprStr)
 		
 		free(OneElement);
 		
-		Op = new DUMMY( );
+		Op = new DummyLogicalOperator( );
 		
 		return new EXPR(Op, LeftExpr, RightExpr);
 	}
@@ -275,12 +275,12 @@ EXPR * QUERY::ParseExpr(char *&ExprStr)
 		p++;  //skip " after first parameter
 		p = SkipSpace(p);
 		if(*p == ')' ) //One parameter in GET
-			Op = new GET( GetCollId( Str ) );
+			Op = new GetLogicalOperator( GetCollId( Str ) );
 		else  if (*p == ',')//Two parameters in GET
 		{
 			p++;    //skip ,
 			Str2 = ParseOneParameter(p);
-			Op = new GET(Str, Str2);
+			Op = new GetLogicalOperator(Str, Str2);
 		}
 		else
 			OUTPUT_ERROR(" GET is missing a COMMA !");
@@ -340,7 +340,7 @@ EXPR * QUERY::ParseExpr(char *&ExprStr)
 		
 		free(OneElement);
 		
-		Op = new RM_DUPLICATES;
+		Op = new RMDuplicatesLogicalOperator;
 		
 		return new EXPR(Op, Expr);
 	}
@@ -365,7 +365,7 @@ EXPR * QUERY::ParseExpr(char *&ExprStr)
 		int Size = GbyKeysSet.GetSize();
 		
 		int NumOps = AggOps->GetSize();
-		Op = new AGG_LIST( GbyKeysSet.CopyOut(), Size, AggOps );
+		Op = new AggregateListLogicalOperator( GbyKeysSet.CopyOut(), Size, AggOps );
 		
 		return new EXPR(Op, Expr);
 	}
@@ -402,7 +402,7 @@ EXPR * QUERY::ParseExpr(char *&ExprStr)
 		
 		free(OneElement);
 		
-		Op = new FUNC_OP( range_var, AttrKeySet.CopyOut(), size);
+		Op = new FunctionLogicalOperator( range_var, AttrKeySet.CopyOut(), size);
 		
 		return new EXPR(Op, Expr);
 	}

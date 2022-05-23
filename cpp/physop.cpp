@@ -78,7 +78,7 @@ double FetchingCost(LOG_COLL_PROP * LogProp)
 
 /*********  FILE_SCAN implementation **************/
 
-FILE_SCAN :: FILE_SCAN (const int fileId)
+FileScanPhysicalOperator :: FileScanPhysicalOperator (const int fileId)
 :FileId(fileId) 	
 {
 	if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_FILE_SCAN].New();
@@ -88,7 +88,7 @@ FILE_SCAN :: FILE_SCAN (const int fileId)
 };
 
 //##ModelId=3B0C086E0153
-FILE_SCAN::FILE_SCAN ( FILE_SCAN& Op)
+FileScanPhysicalOperator::FileScanPhysicalOperator ( FileScanPhysicalOperator& Op)
 :FileId(Op.GetFileId())
 {
 	if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_FILE_SCAN].New();
@@ -99,7 +99,7 @@ FILE_SCAN::FILE_SCAN ( FILE_SCAN& Op)
 
 // get the physical prop according to the order of the collection
 //##ModelId=3B0C086E017A
-PHYS_PROP * FILE_SCAN::FindPhysProp(PHYS_PROP ** input_phys_props)
+PHYS_PROP * FileScanPhysicalOperator::FindPhysProp(PHYS_PROP ** input_phys_props)
 {
 	COLL_PROP * CollProp = Cat->GetCollProp(FileId); 
 	
@@ -119,7 +119,7 @@ PHYS_PROP * FILE_SCAN::FindPhysProp(PHYS_PROP ** input_phys_props)
 }
 
 //##ModelId=3B0C086E0170
-COST * FILE_SCAN::FindLocalCost (
+COST * FileScanPhysicalOperator::FindLocalCost (
 								 LOG_PROP    * LocalLogProp,
 								 LOG_PROP ** InputLogProp)
 {
@@ -137,7 +137,7 @@ COST * FILE_SCAN::FindLocalCost (
 /************ LOOPS_JOIN FUNCTIONS ****************/
 
 //##ModelId=3B0C086E0242
-LOOPS_JOIN::LOOPS_JOIN(int * lattrs, int * rattrs, int size)
+LoopsJoinPhysicalOperator::LoopsJoinPhysicalOperator(int * lattrs, int * rattrs, int size)
 :lattrs(lattrs),rattrs(rattrs),size(size)
 {
 	if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_LOOPS_JOIN].New();
@@ -147,7 +147,7 @@ LOOPS_JOIN::LOOPS_JOIN(int * lattrs, int * rattrs, int size)
 } // LOOPS_JOIN::LOOPS_JOIN
 
 //##ModelId=3B0C086E0256
-LOOPS_JOIN::LOOPS_JOIN( LOOPS_JOIN& Op)
+LoopsJoinPhysicalOperator::LoopsJoinPhysicalOperator( LoopsJoinPhysicalOperator& Op)
 :lattrs( CopyArray(Op.lattrs,Op.size) ), 
 rattrs( CopyArray(Op.rattrs,Op.size) ), 
 size(Op.size)
@@ -160,7 +160,7 @@ size(Op.size)
 
 #pragma optimize("", off )	// turn of code optimization due to error result
 //##ModelId=3B0C086E026B
-COST * LOOPS_JOIN::FindLocalCost (
+COST * LoopsJoinPhysicalOperator::FindLocalCost (
 								  LOG_PROP    * LocalLogProp, 
 								  LOG_PROP ** InputLogProp)
 { 
@@ -182,7 +182,7 @@ COST * LOOPS_JOIN::FindLocalCost (
 // requirement is: left input must have the same props as the output,
 //					while right input has no required prop
 //##ModelId=3B0C086E0276
-PHYS_PROP * LOOPS_JOIN::InputReqdProp(PHYS_PROP * PhysProp, LOG_PROP * InputLogProp, 
+PHYS_PROP * LoopsJoinPhysicalOperator::InputReqdProp(PHYS_PROP * PhysProp, LOG_PROP * InputLogProp, 
 									  int InputNo, bool & possible)
 {
 	if(PhysProp->GetOrder()!=any)		// check possibility: satisfied output prop
@@ -207,7 +207,7 @@ PHYS_PROP * LOOPS_JOIN::InputReqdProp(PHYS_PROP * PhysProp, LOG_PROP * InputLogP
 }
 
 //##ModelId=3B0C086E029C
-CString LOOPS_JOIN::Dump()
+CString LoopsJoinPhysicalOperator::Dump()
 {	
 	CString os;
     CString temp;
@@ -249,7 +249,7 @@ CString LOOPS_JOIN::Dump()
 /************ PDUMMY FUNCTIONS ****************/
 
 //##ModelId=3B0C086E031F
-PDUMMY::PDUMMY()
+DummyPhysicalOperator::DummyPhysicalOperator()
 {
 #ifdef _DEBUG
 	name = GetName();
@@ -257,7 +257,7 @@ PDUMMY::PDUMMY()
 } // PDUMMY::PDUMMY
 
 //##ModelId=3B0C086E0328
-PDUMMY::PDUMMY( PDUMMY& Op)
+DummyPhysicalOperator::DummyPhysicalOperator( DummyPhysicalOperator& Op)
 {
 #ifdef _DEBUG
 	name = GetName();
@@ -266,7 +266,7 @@ PDUMMY::PDUMMY( PDUMMY& Op)
 
 //Imitate LOOPS_JOIN - why not?
 //##ModelId=3B0C086E0346
-COST * PDUMMY::FindLocalCost (
+COST * DummyPhysicalOperator::FindLocalCost (
 							  LOG_PROP *  LocalLogProp, 
 							  LOG_PROP ** InputLogProp)
 { 
@@ -287,7 +287,7 @@ COST * PDUMMY::FindLocalCost (
 // requirement is: left input must have the same props as the output,
 //					while right input has no required prop
 //##ModelId=3B0C086E0350
-PHYS_PROP * PDUMMY::InputReqdProp(PHYS_PROP * PhysProp, LOG_PROP * InputLogProp, 
+PHYS_PROP * DummyPhysicalOperator::InputReqdProp(PHYS_PROP * PhysProp, LOG_PROP * InputLogProp, 
 								  int InputNo, bool & possible)
 {
 	if(PhysProp->GetOrder()!=any)		// check possibility: satisfied output prop
@@ -312,7 +312,7 @@ PHYS_PROP * PDUMMY::InputReqdProp(PHYS_PROP * PhysProp, LOG_PROP * InputLogProp,
 }
 
 //##ModelId=3B0C086E036E
-CString PDUMMY::Dump()
+CString DummyPhysicalOperator::Dump()
 {	
 	CString os = GetName();
 	
@@ -326,7 +326,7 @@ Nested loops index join
 */
 
 //##ModelId=3B0C086F0031
-LOOPS_INDEX_JOIN::LOOPS_INDEX_JOIN(int * lattrs, int * rattrs, int size, int CollId)
+LoopsIndexJoinPhysicalOperator::LoopsIndexJoinPhysicalOperator(int * lattrs, int * rattrs, int size, int CollId)
 :lattrs(lattrs),rattrs(rattrs),size(size),CollId(CollId)
 {
 	if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_LOOPS_INDEX_JOIN].New();
@@ -336,7 +336,7 @@ LOOPS_INDEX_JOIN::LOOPS_INDEX_JOIN(int * lattrs, int * rattrs, int size, int Col
 } // LOOPS_INDEX_JOIN::LOOPS_INDEX_JOIN
 
 //##ModelId=3B0C086F0045
-LOOPS_INDEX_JOIN::LOOPS_INDEX_JOIN( LOOPS_INDEX_JOIN& Op)
+LoopsIndexJoinPhysicalOperator::LoopsIndexJoinPhysicalOperator( LoopsIndexJoinPhysicalOperator& Op)
 :lattrs( CopyArray(Op.lattrs,Op.size) ), 
 rattrs( CopyArray(Op.rattrs,Op.size) ), 
 size(Op.size),CollId(Op.CollId)
@@ -349,7 +349,7 @@ size(Op.size),CollId(Op.CollId)
 
 
 //##ModelId=3B0C086F0059
-COST * LOOPS_INDEX_JOIN::FindLocalCost (
+COST * LoopsIndexJoinPhysicalOperator::FindLocalCost (
 										LOG_PROP *  LocalLogProp, 
 										LOG_PROP ** InputLogProp)
 { 
@@ -374,7 +374,7 @@ COST * LOOPS_INDEX_JOIN::FindLocalCost (
 } //FindLocalCost
 
 //##ModelId=3B0C086F0064
-PHYS_PROP * LOOPS_INDEX_JOIN::InputReqdProp(PHYS_PROP * PhysProp, LOG_PROP * InputLogProp, 
+PHYS_PROP * LoopsIndexJoinPhysicalOperator::InputReqdProp(PHYS_PROP * PhysProp, LOG_PROP * InputLogProp, 
 											int InputNo, bool & possible)
 {
 	assert(InputNo==0);		// only one input
@@ -399,7 +399,7 @@ PHYS_PROP * LOOPS_INDEX_JOIN::InputReqdProp(PHYS_PROP * PhysProp, LOG_PROP * Inp
 }
 
 //##ModelId=3B0C086F0081
-CString LOOPS_INDEX_JOIN::Dump()
+CString LoopsIndexJoinPhysicalOperator::Dump()
 {	
 	CString os;
     CString temp;
@@ -447,7 +447,7 @@ Merge join
 */
 
 //##ModelId=3B0C086F013F
-MERGE_JOIN::MERGE_JOIN(int * lattrs, int * rattrs, int size)
+MergeJoinPhysicalOperator::MergeJoinPhysicalOperator(int * lattrs, int * rattrs, int size)
 :lattrs(lattrs),rattrs(rattrs),size(size)
 {
 	if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_MERGE_JOIN].New();
@@ -457,7 +457,7 @@ MERGE_JOIN::MERGE_JOIN(int * lattrs, int * rattrs, int size)
 } // MERGE_JOIN::MERGE_JOIN
 
 //##ModelId=3B0C086F014B
-MERGE_JOIN::MERGE_JOIN( MERGE_JOIN& Op)
+MergeJoinPhysicalOperator::MergeJoinPhysicalOperator( MergeJoinPhysicalOperator& Op)
 :lattrs( CopyArray(Op.lattrs,Op.size) ), 
 rattrs( CopyArray(Op.rattrs,Op.size) ), 
 size(Op.size)
@@ -469,7 +469,7 @@ size(Op.size)
 };
 
 //##ModelId=3B0C086F0167
-COST * MERGE_JOIN::FindLocalCost (
+COST * MergeJoinPhysicalOperator::FindLocalCost (
 								  LOG_PROP *  LocalLogProp, 
 								  LOG_PROP ** InputLogProp)
 { 
@@ -488,7 +488,7 @@ COST * MERGE_JOIN::FindLocalCost (
 } //FindLocalCost
 
 //##ModelId=3B0C086F0199
-CString MERGE_JOIN::Dump()
+CString MergeJoinPhysicalOperator::Dump()
 {	
 	CString os;
     CString temp;
@@ -529,7 +529,7 @@ CString MERGE_JOIN::Dump()
 
 // inputs must be sorted
 //##ModelId=3B0C086F0171
-PHYS_PROP * MERGE_JOIN::InputReqdProp(PHYS_PROP * PhysProp, LOG_PROP * InputLogProp, 
+PHYS_PROP * MergeJoinPhysicalOperator::InputReqdProp(PHYS_PROP * PhysProp, LOG_PROP * InputLogProp, 
 									  int InputNo, bool & possible)
 {
 	if(PhysProp->GetOrder() != any)			// If specific output property is required
@@ -559,7 +559,7 @@ PHYS_PROP * MERGE_JOIN::InputReqdProp(PHYS_PROP * PhysProp, LOG_PROP * InputLogP
 // the physprop of the output is sorted on lattrs, rattrs, in the order of 
 // attrs of the EQJOIN operator
 //##ModelId=3B0C086F018F
-PHYS_PROP * MERGE_JOIN::FindPhysProp(PHYS_PROP ** input_phys_props)
+PHYS_PROP * MergeJoinPhysicalOperator::FindPhysProp(PHYS_PROP ** input_phys_props)
 {
 	KEYS_SET *Keys, *Keys2;
 	Keys = new KEYS_SET(lattrs, size);
@@ -580,7 +580,7 @@ PHYS_PROP * MERGE_JOIN::FindPhysProp(PHYS_PROP ** input_phys_props)
 */
 
 //##ModelId=3B0C086F0239
-HASH_JOIN::HASH_JOIN(int * lattrs, int * rattrs, int size)
+HashJoinPhysicalOperator::HashJoinPhysicalOperator(int * lattrs, int * rattrs, int size)
 :lattrs(lattrs),rattrs(rattrs),size(size)
 {
 	if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_HASH_JOIN].New();
@@ -590,7 +590,7 @@ HASH_JOIN::HASH_JOIN(int * lattrs, int * rattrs, int size)
 } // HASH_JOIN::HASH_JOIN
 
 //##ModelId=3B0C086F024D
-HASH_JOIN::HASH_JOIN( HASH_JOIN& Op)
+HashJoinPhysicalOperator::HashJoinPhysicalOperator( HashJoinPhysicalOperator& Op)
 :lattrs( CopyArray(Op.lattrs,Op.size) ), 
 rattrs( CopyArray(Op.rattrs,Op.size) ), 
 size(Op.size)
@@ -602,7 +602,7 @@ size(Op.size)
 };
 
 //##ModelId=3B0C086F0261
-COST * HASH_JOIN::FindLocalCost (
+COST * HashJoinPhysicalOperator::FindLocalCost (
 								 LOG_PROP *  LocalLogProp, 
 								 LOG_PROP ** InputLogProp)
 { 
@@ -621,7 +621,7 @@ COST * HASH_JOIN::FindLocalCost (
 } //FindLocalCost
 
 //##ModelId=3B0C086F028A
-CString HASH_JOIN::Dump()
+CString HashJoinPhysicalOperator::Dump()
 {	
 	CString os;
     CString temp;
@@ -662,7 +662,7 @@ CString HASH_JOIN::Dump()
 
 // No properties are required of inputs 
 //##ModelId=3B0C086F026B
-PHYS_PROP * HASH_JOIN::InputReqdProp(PHYS_PROP * PhysProp, LOG_PROP * InputLogProp, 
+PHYS_PROP * HashJoinPhysicalOperator::InputReqdProp(PHYS_PROP * PhysProp, LOG_PROP * InputLogProp, 
 									 int InputNo, bool & possible)
 {
 	if(PhysProp->GetOrder()!=any)		// check possibility: satisfied output prop
@@ -693,7 +693,7 @@ PHYS_PROP * HASH_JOIN::InputReqdProp(PHYS_PROP * PhysProp, LOG_PROP * InputLogPr
  ======
 */
 //##ModelId=3B0C08700050
-COST * FILTER::FindLocalCost (
+COST * FilterPhysicalOperator::FindLocalCost (
 							  LOG_PROP *  LocalLogProp, 
 							  LOG_PROP ** InputLogProp)
 { 
@@ -712,7 +712,7 @@ COST * FILTER::FindLocalCost (
 } //FindLocalCost
 
 //##ModelId=3B0C0870005C
-PHYS_PROP * FILTER::InputReqdProp(PHYS_PROP * PhysProp, LOG_PROP * InputLogProp, 
+PHYS_PROP * FilterPhysicalOperator::InputReqdProp(PHYS_PROP * PhysProp, LOG_PROP * InputLogProp, 
 								  int InputNo, bool & possible)
 {
 	if(InputNo==1)	 // right input is Item Group, no reqd prop for it
@@ -743,7 +743,7 @@ PHYS_PROP * FILTER::InputReqdProp(PHYS_PROP * PhysProp, LOG_PROP * InputLogProp,
 
 
 //##ModelId=3B0C086F0348
-P_PROJECT::P_PROJECT(int * attrs, int size)
+ProjectPhysicalOperator::ProjectPhysicalOperator(int * attrs, int size)
 :attrs(attrs),size(size)
 {
 	if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_P_PROJECT].New();
@@ -753,7 +753,7 @@ P_PROJECT::P_PROJECT(int * attrs, int size)
 } // P_PROJECT::P_PROJECT
 
 //##ModelId=3B0C086F0352
-P_PROJECT::P_PROJECT( P_PROJECT& Op)
+ProjectPhysicalOperator::ProjectPhysicalOperator( ProjectPhysicalOperator& Op)
 :attrs( CopyArray(Op.attrs,Op.size) ), 
 size(Op.size)
 {
@@ -764,7 +764,7 @@ size(Op.size)
 };
 
 //##ModelId=3B0C086F0367
-COST * P_PROJECT::FindLocalCost (
+COST * ProjectPhysicalOperator::FindLocalCost (
 								 LOG_PROP *  LocalLogProp, 
 								 LOG_PROP ** InputLogProp)
 { 
@@ -784,7 +784,7 @@ COST * P_PROJECT::FindLocalCost (
 } //FindLocalCost
 
 //##ModelId=3B0C086F0372
-PHYS_PROP * P_PROJECT::InputReqdProp(PHYS_PROP * PhysProp, LOG_PROP * InputLogProp, 
+PHYS_PROP * ProjectPhysicalOperator::InputReqdProp(PHYS_PROP * PhysProp, LOG_PROP * InputLogProp, 
 									 int InputNo, bool & possible)
 {
 	assert(InputNo==0);		// only one input
@@ -809,7 +809,7 @@ PHYS_PROP * P_PROJECT::InputReqdProp(PHYS_PROP * PhysProp, LOG_PROP * InputLogPr
 }
 
 //##ModelId=3B0C086F038F
-CString P_PROJECT::Dump()
+CString ProjectPhysicalOperator::Dump()
 {
 	CString os;
 	CString temp;
@@ -835,7 +835,7 @@ CString P_PROJECT::Dump()
 */
 
 //##ModelId=3B0C08700136
-QSORT::QSORT() 
+QsortPhysicalOperator::QsortPhysicalOperator() 
 {
 	if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_QSORT].New();
 #ifdef _DEBUG
@@ -844,7 +844,7 @@ QSORT::QSORT()
 } // QSORT::QSORT
 
 //##ModelId=3B0C08700140
-QSORT::QSORT( QSORT& Op)
+QsortPhysicalOperator::QsortPhysicalOperator( QsortPhysicalOperator& Op)
 {
 	if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_QSORT].New();
 #ifdef _DEBUG
@@ -853,13 +853,13 @@ QSORT::QSORT( QSORT& Op)
 };
 
 //##ModelId=3B0C0870017D
-CString QSORT::Dump()
+CString QsortPhysicalOperator::Dump()
 {
 	return GetName();
 } //QSORT::Dump
 
 //##ModelId=3B0C0870014C
-COST * QSORT::FindLocalCost (
+COST * QsortPhysicalOperator::FindLocalCost (
 							 LOG_PROP *  LocalLogProp, 
 							 LOG_PROP ** InputLogProp)
 { 
@@ -882,7 +882,7 @@ COST * QSORT::FindLocalCost (
 } // QSORT::FindLocalCost
 
 //##ModelId=3B0C0870015F
-PHYS_PROP * QSORT::InputReqdProp(PHYS_PROP * PhysProp, LOG_PROP * InputLogProp, 
+PHYS_PROP * QsortPhysicalOperator::InputReqdProp(PHYS_PROP * PhysProp, LOG_PROP * InputLogProp, 
 								 int InputNo, bool & possible)
 {
 	if( PhysProp->GetOrder() == any )
@@ -907,7 +907,7 @@ PHYS_PROP * QSORT::InputReqdProp(PHYS_PROP * PhysProp, LOG_PROP * InputLogProp,
 }//QSORT::InputReqdProp
 
 //##ModelId=3B0C0870023B
-COST * HASH_DUPLICATES::FindLocalCost (
+COST * HashDuplicatesPhysicalOperator::FindLocalCost (
 									   LOG_PROP *  LocalLogProp, 
 									   LOG_PROP ** InputLogProp)
 { 
@@ -927,7 +927,7 @@ COST * HASH_DUPLICATES::FindLocalCost (
 } //FindLocalCost
 
 //##ModelId=3B0C08700245
-PHYS_PROP * HASH_DUPLICATES::InputReqdProp(PHYS_PROP * PhysProp, LOG_PROP * InputLogProp, 
+PHYS_PROP * HashDuplicatesPhysicalOperator::InputReqdProp(PHYS_PROP * PhysProp, LOG_PROP * InputLogProp, 
 										   int InputNo, bool & possible)
 {
 	assert(InputNo==0);  //one input
@@ -937,7 +937,7 @@ PHYS_PROP * HASH_DUPLICATES::InputReqdProp(PHYS_PROP * PhysProp, LOG_PROP * Inpu
 }
 
 //##ModelId=3B0C08700263
-CString HASH_DUPLICATES::Dump()
+CString HashDuplicatesPhysicalOperator::Dump()
 {
 	return GetName();
 } //HASH_DUPLICATES::Dump
@@ -946,7 +946,7 @@ CString HASH_DUPLICATES::Dump()
 // since it actually requires more than one pass. 
 // One pass to group, count and sum. and one pass to divide sum by count
 //##ModelId=3B0C087003A3
-COST * HGROUP_LIST::FindLocalCost (
+COST * HashAggListPhysicalOperator::FindLocalCost (
 								   LOG_PROP *  LocalLogProp, 
 								   LOG_PROP ** InputLogProp)
 { 
@@ -964,7 +964,7 @@ COST * HGROUP_LIST::FindLocalCost (
 } //HGROUP_LIST::FindLocalCost
 
 //##ModelId=3B0C087003AD
-PHYS_PROP * HGROUP_LIST::InputReqdProp(PHYS_PROP * PhysProp, LOG_PROP * InputLogProp, 
+PHYS_PROP * HashAggListPhysicalOperator::InputReqdProp(PHYS_PROP * PhysProp, LOG_PROP * InputLogProp, 
 									   int InputNo, bool & possible)
 {
 	assert(InputNo==0);  //one input
@@ -976,7 +976,7 @@ PHYS_PROP * HGROUP_LIST::InputReqdProp(PHYS_PROP * PhysProp, LOG_PROP * InputLog
 
 //the physprop of the output is sorted on Gby attrs
 //##ModelId=3B0C087003CC
-PHYS_PROP * HGROUP_LIST::FindPhysProp(PHYS_PROP ** input_phys_props)
+PHYS_PROP * HashAggListPhysicalOperator::FindPhysProp(PHYS_PROP ** input_phys_props)
 {
 	KEYS_SET *Keys;
 	Keys = new KEYS_SET(GbyAtts, GbySize);
@@ -988,7 +988,7 @@ PHYS_PROP * HGROUP_LIST::FindPhysProp(PHYS_PROP ** input_phys_props)
 }//HGROUP_LIST::FindPhysProp
 
 //##ModelId=3B0C087003D6
-CString HGROUP_LIST::Dump()
+CString HashAggListPhysicalOperator::Dump()
 {
 	CString os;
 	CString temp;
@@ -1031,7 +1031,7 @@ CString HGROUP_LIST::Dump()
 } //HGROUP_LIST::Dump
 
 //##ModelId=3B0C0871011B
-COST * P_FUNC_OP::FindLocalCost (
+COST * FunctionPhysicalOperator::FindLocalCost (
 								 LOG_PROP *  LocalLogProp, 
 								 LOG_PROP ** InputLogProp)
 { 
@@ -1047,7 +1047,7 @@ COST * P_FUNC_OP::FindLocalCost (
 } //P_FUNC_OP::FindLocalCost
 
 //##ModelId=3B0C08710125
-PHYS_PROP * P_FUNC_OP::InputReqdProp(PHYS_PROP * PhysProp, LOG_PROP * InputLogProp, 
+PHYS_PROP * FunctionPhysicalOperator::InputReqdProp(PHYS_PROP * PhysProp, LOG_PROP * InputLogProp, 
 									 int InputNo, bool & possible)
 {
 	assert(InputNo==0);  //one input
@@ -1057,7 +1057,7 @@ PHYS_PROP * P_FUNC_OP::InputReqdProp(PHYS_PROP * PhysProp, LOG_PROP * InputLogPr
 }
 
 //##ModelId=3B0C08710142
-CString P_FUNC_OP::Dump()
+CString FunctionPhysicalOperator::Dump()
 {
 	CString os;
 	CString temp;
@@ -1080,7 +1080,7 @@ CString P_FUNC_OP::Dump()
 }
 
 //##ModelId=3B0C087102B4
-BIT_JOIN::BIT_JOIN(int * lattrs, int * rattrs, int size, int CollId)
+BitJoinPhysicalOperator::BitJoinPhysicalOperator(int * lattrs, int * rattrs, int size, int CollId)
 :lattrs(lattrs),rattrs(rattrs),size(size),CollId(CollId)
 {
 	if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_BIT_JOIN].New();
@@ -1090,7 +1090,7 @@ BIT_JOIN::BIT_JOIN(int * lattrs, int * rattrs, int size, int CollId)
 } // BIT_JOIN::BIT_JOIN
 
 //##ModelId=3B0C087102C1
-BIT_JOIN::BIT_JOIN( BIT_JOIN& Op)
+BitJoinPhysicalOperator::BitJoinPhysicalOperator( BitJoinPhysicalOperator& Op)
 :lattrs( CopyArray(Op.lattrs,Op.size) ), 
 rattrs( CopyArray(Op.rattrs,Op.size) ), 
 size(Op.size), CollId(Op.CollId)
@@ -1102,7 +1102,7 @@ size(Op.size), CollId(Op.CollId)
 };
 
 //##ModelId=3B0C087102D4
-COST * BIT_JOIN::FindLocalCost (
+COST * BitJoinPhysicalOperator::FindLocalCost (
 								LOG_PROP *  LocalLogProp, 
 								LOG_PROP ** InputLogProp)
 { 
@@ -1129,7 +1129,7 @@ COST * BIT_JOIN::FindLocalCost (
 } //BIT_JOIN::FindLocalCost 
 
 //##ModelId=3B0C087102DF
-PHYS_PROP * BIT_JOIN::InputReqdProp(PHYS_PROP * PhysProp, LOG_PROP * InputLogProp, 
+PHYS_PROP * BitJoinPhysicalOperator::InputReqdProp(PHYS_PROP * PhysProp, LOG_PROP * InputLogProp, 
 									int InputNo, bool & possible)
 {
 	if(InputNo==1)	 // no reqd prop for right input
@@ -1153,7 +1153,7 @@ PHYS_PROP * BIT_JOIN::InputReqdProp(PHYS_PROP * PhysProp, LOG_PROP * InputLogPro
 }
 
 //##ModelId=3B0C08710305
-CString BIT_JOIN::Dump()
+CString BitJoinPhysicalOperator::Dump()
 {	
 	CString os;
     CString temp;
@@ -1197,14 +1197,14 @@ CString BIT_JOIN::Dump()
 
 //the physprop of the output is the left input prop
 //##ModelId=3B0C087102F1
-PHYS_PROP * BIT_JOIN::FindPhysProp(PHYS_PROP ** input_phys_props)
+PHYS_PROP * BitJoinPhysicalOperator::FindPhysProp(PHYS_PROP ** input_phys_props)
 {
 	return input_phys_props[0];
 }//BIT_JOIN::FindPhysProp
 
 //INDEXED_FILTER
 //##ModelId=3B0C08720036
-INDEXED_FILTER :: INDEXED_FILTER (const int fileId)
+IndexedFilterPhysicalOperator :: IndexedFilterPhysicalOperator (const int fileId)
 :FileId(fileId) 	
 {
 	if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_INDEXED_FILTER].New();
@@ -1214,7 +1214,7 @@ INDEXED_FILTER :: INDEXED_FILTER (const int fileId)
 };
 
 //##ModelId=3B0C0872003F
-INDEXED_FILTER::INDEXED_FILTER ( INDEXED_FILTER& Op)
+IndexedFilterPhysicalOperator::IndexedFilterPhysicalOperator ( IndexedFilterPhysicalOperator& Op)
 :FileId(Op.GetFileId())
 {
 	if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_INDEXED_FILTER].New();
@@ -1224,7 +1224,7 @@ INDEXED_FILTER::INDEXED_FILTER ( INDEXED_FILTER& Op)
 }
 
 //##ModelId=3B0C08720053
-COST * INDEXED_FILTER::FindLocalCost (
+COST * IndexedFilterPhysicalOperator::FindLocalCost (
 									  LOG_PROP *  LocalLogProp,
 									  LOG_PROP ** InputLogProp)
 {
@@ -1308,7 +1308,7 @@ COST * INDEXED_FILTER::FindLocalCost (
 }
 
 //##ModelId=3B0C0872005D
-PHYS_PROP * INDEXED_FILTER::InputReqdProp(PHYS_PROP * PhysProp, LOG_PROP * InputLogProp, 
+PHYS_PROP * IndexedFilterPhysicalOperator::InputReqdProp(PHYS_PROP * PhysProp, LOG_PROP * InputLogProp, 
 										  int InputNo, bool & possible)
 {
 	assert(InputNo==0);  //one input

@@ -168,7 +168,7 @@ private:
 	//##ModelId=3B0C0865025D
 	int	counter;				// to keep track of how many winners point to this MEXPR
 	//##ModelId=3B0C0865027C
-	OP*		Op;					//Operator
+	Operator*		Op;					//Operator
 	//##ModelId=3B0C08650299
 	GRP_ID*	Inputs;
 	//##ModelId=3B0C086502AE
@@ -211,7 +211,7 @@ public:
 	//##ModelId=3B0C08650326
 	inline void DecCounter () { if (counter != 0)	counter--; };
 	//##ModelId=3B0C0865032F
-	inline OP * GetOp() {return(Op); } ;
+	inline Operator * GetOp() {return(Op); } ;
 	//##ModelId=3B0C08650339
 	inline GRP_ID GetInput(int i) const {return(Inputs[i]);};
 	//##ModelId=3B0C0865034D

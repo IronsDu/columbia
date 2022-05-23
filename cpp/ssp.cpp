@@ -438,7 +438,7 @@ M_EXPR*	SSP::CopyIn(EXPR * Expr, GRP_ID& GrpID)
 #endif
 		
 		M_EXPR * WinnerMExpr;
-		OP * WinnerOp ;
+		Operator * WinnerOp ;
 		CString os;
 		
 		//special case : it's a const group
@@ -577,7 +577,7 @@ M_EXPR*	SSP::CopyIn(EXPR * Expr, GRP_ID& GrpID)
 			{
 				GRP_ID input_groupno = WinnerMExpr -> GetInput(i);
 				
-				ReqProp = ((PHYS_OP*)WinnerOp) -> InputReqdProp(PhysProp, 
+				ReqProp = ((PhysicalOperator*)WinnerOp) -> InputReqdProp(PhysProp, 
 					Ssp->GetGroup(input_groupno)->get_log_prop(),
 					i, possible);
 				

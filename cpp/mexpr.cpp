@@ -40,7 +40,7 @@ HashPtr(NULL), RuleMask(0)
 			input = Expr->GetInput(i);
 			
 			if( input -> GetOp() -> is_leaf() )	// deal with LEAF_OP, sharing the existing group
-				GID = ((LEAF_OP *)input->GetOp() ) -> GetGroup();
+				GID = ((LeafOperator *)input->GetOp() ) -> GetGroup();
 			else
 			{		
 				// create a new sub group

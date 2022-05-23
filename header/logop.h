@@ -25,14 +25,14 @@ Columbia Optimizer Framework
 #define		FUNC_OP_ID		7777
 #define		DUMMY_ID		8888
 
-class GET;
-class SELECT;
-class PROJECT;
-class EQJOIN;
-class DUMMY;
-class RM_DUPLICATES;
-class AGG_LIST;
-class FUNC_OP;
+class GetLogicalOperator;
+class SelectLogicalOperator;
+class ProjectLogicalOperator;
+class EQJoinLogicalOperator;
+class DummyLogicalOperator;
+class RMDuplicatesLogicalOperator;
+class AggregateListLogicalOperator;
+class FunctionLogicalOperator;
 
 /*
 ============================================================
@@ -46,23 +46,23 @@ E is the RangeVar.
 */
 
 //##ModelId=3B0C087301E5
-class GET : public LOG_OP
+class GetLogicalOperator : public LogicalOperator
 {
 	
 public :
     // If the query includes FROM EMP e, then EMP is the collection
     // and e is the range variable.
 	//##ModelId=3B0C087301F0
-	GET ( CString collection,  CString rangeVar);
+	GetLogicalOperator ( CString collection,  CString rangeVar);
 	//##ModelId=3B0C087301FB
-	GET ( int collId);	//Range Variable defaults to Collection here
+	GetLogicalOperator ( int collId);	//Range Variable defaults to Collection here
 	//##ModelId=3B0C08730204
-	GET( GET& Op );
+	GetLogicalOperator( GetLogicalOperator& Op );
 	//##ModelId=3B0C0873020E
-	OP * Clone() { return new GET(*this); };
+	Operator * Clone() { return new GetLogicalOperator(*this); };
 	
 	//##ModelId=3B0C08730217
-	~GET() { if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_GET].Delete(); };
+	~GetLogicalOperator() { if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_GET].Delete(); };
 	
 	//##ModelId=3B0C08730218
 	LOG_PROP * FindLogProp (LOG_PROP ** input);
@@ -76,10 +76,10 @@ public :
 	//##ModelId=3B0C0873023F
 	inline int GetCollection() {return CollId;};
 	//##ModelId=3B0C08730240
-    inline bool operator==(OP * other) 
+    inline bool operator==(Operator * other) 
 	{	return ( other->GetNameId() == GetNameId() &&
-	((GET*)other)->CollId == CollId && 
-	((GET*)other)->RangeVar == RangeVar) ;
+	((GetLogicalOperator*)other)->CollId == CollId && 
+	((GetLogicalOperator*)other)->RangeVar == RangeVar) ;
 	};
 	
 	//##ModelId=3B0C0873024A
@@ -108,7 +108,7 @@ private :
 */
 
 //##ModelId=3B0C087302DF
-class EQJOIN : public LOG_OP
+class EQJoinLogicalOperator : public LogicalOperator
 {
 	
 public:
@@ -128,14 +128,14 @@ public:
 public :
 	
 	//##ModelId=3B0C08730311
-	EQJOIN(int *lattrs, int *rattrs, int size);
+	EQJoinLogicalOperator(int *lattrs, int *rattrs, int size);
 	//##ModelId=3B0C08730326
-	EQJOIN( EQJOIN& Op);	
+	EQJoinLogicalOperator( EQJoinLogicalOperator& Op);	
 	//##ModelId=3B0C08730328
-	OP * Clone() { return new EQJOIN(*this); };
+	Operator * Clone() { return new EQJoinLogicalOperator(*this); };
 	
 	//##ModelId=3B0C08730330
-	~EQJOIN() 
+	~EQJoinLogicalOperator() 
 	{	
 		if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_EQJOIN].Delete();
 		delete [] lattrs;
@@ -152,11 +152,11 @@ public :
 	//##ModelId=3B0C0873034E
 	inline int GetNameId() {return EQJOIN_ID; };   //Name of this operator
 	//##ModelId=3B0C08730358
-	inline bool operator== (OP * other)
+	inline bool operator== (Operator * other)
 	{
 		return ( other->GetNameId() == GetNameId() &&
-			    EqualArray( ((EQJOIN*)other)->lattrs,lattrs,size) &&  //arguments are equal
-			    EqualArray( ((EQJOIN*)other)->rattrs,rattrs,size) );
+			    EqualArray( ((EQJoinLogicalOperator*)other)->lattrs,lattrs,size) &&  //arguments are equal
+			    EqualArray( ((EQJoinLogicalOperator*)other)->rattrs,rattrs,size) );
 	};
 	
     //since this operator has arguments
@@ -197,20 +197,20 @@ public:
 */
 
 //##ModelId=3B0C0874001A
-class DUMMY : public LOG_OP
+class DummyLogicalOperator : public LogicalOperator
 {
 	
 public :
 	
 	//##ModelId=3B0C0874002F
-	DUMMY();
+	DummyLogicalOperator();
 	//##ModelId=3B0C08740030
-	DUMMY( DUMMY& Op);	
+	DummyLogicalOperator( DummyLogicalOperator& Op);	
 	//##ModelId=3B0C08740039
-	OP * Clone() { return new DUMMY(*this); };
+	Operator * Clone() { return new DummyLogicalOperator(*this); };
 	
 	//##ModelId=3B0C08740042
-	~DUMMY() {};
+	~DummyLogicalOperator() {};
 	
 	//##ModelId=3B0C08740043
 	LOG_PROP * FindLogProp (LOG_PROP ** input);
@@ -222,7 +222,7 @@ public :
 	//##ModelId=3B0C08740057
 	inline int GetNameId() {return DUMMY_ID; };   //Name of this operator
 	//##ModelId=3B0C08740060
-	inline bool operator== (OP * other) { return ( other->GetNameId() == GetNameId() );};
+	inline bool operator== (Operator * other) { return ( other->GetNameId() == GetNameId() );};
 	
 	//##ModelId=3B0C0874006B
     ub4 hash() ;
@@ -242,20 +242,20 @@ public :
 */
 
 //##ModelId=3B0C087400F6
-class SELECT : public LOG_OP
+class SelectLogicalOperator : public LogicalOperator
 {
 	
 public :
 	
 	//##ModelId=3B0C08740101
-    SELECT();
+    SelectLogicalOperator();
 	//##ModelId=3B0C0874010A
-	SELECT( SELECT& Op);	
+	SelectLogicalOperator( SelectLogicalOperator& Op);	
 	//##ModelId=3B0C08740114
-	OP * Clone() { return new SELECT(*this); };
+	Operator * Clone() { return new SelectLogicalOperator(*this); };
 	
 	//##ModelId=3B0C08740115
-	~SELECT() { if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_SELECT].Delete(); };
+	~SelectLogicalOperator() { if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_SELECT].Delete(); };
 	
 	//##ModelId=3B0C08740116
     LOG_PROP * FindLogProp (LOG_PROP ** input) ;
@@ -267,7 +267,7 @@ public :
 	//##ModelId=3B0C08740132
 	inline int GetNameId() {return SELECT_ID; };   //Name of this operator
 	//##ModelId=3B0C08740133
-	inline bool operator== (OP * other)
+	inline bool operator== (Operator * other)
 	{	return ( other->GetNameId() == GetNameId() ); }
 	
 	//##ModelId=3B0C0874013D
@@ -287,7 +287,7 @@ public :
 */
 
 //##ModelId=3B0C087401DC
-class PROJECT : public LOG_OP
+class ProjectLogicalOperator : public LogicalOperator
 {
 	
 public :
@@ -298,14 +298,14 @@ public :
 	int size;		// the number of the attrs
 	
 	//##ModelId=3B0C08740205
-    PROJECT(int * attrs, int size);
+    ProjectLogicalOperator(int * attrs, int size);
 	//##ModelId=3B0C08740210
-	PROJECT( PROJECT& Op);	
+	ProjectLogicalOperator( ProjectLogicalOperator& Op);	
 	//##ModelId=3B0C08740219
-	OP * Clone() { return new PROJECT(*this); };
+	Operator * Clone() { return new ProjectLogicalOperator(*this); };
 	
 	//##ModelId=3B0C0874021A
-	~PROJECT() 
+	~ProjectLogicalOperator() 
 	{	
 		if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_PROJECT].Delete();
 		delete [] attrs;
@@ -321,10 +321,10 @@ public :
 	//##ModelId=3B0C08740237
 	inline int GetNameId() {return PROJECT_ID; };   //Name of this operator
 	//##ModelId=3B0C08740241
-	inline bool operator== (OP * other)
+	inline bool operator== (Operator * other)
 	{
 		return ( other->GetNameId() == GetNameId() &&
-			   EqualArray( ((PROJECT*)other)->attrs, attrs, size )  ); //arguments are equal
+			   EqualArray( ((ProjectLogicalOperator*)other)->attrs, attrs, size )  ); //arguments are equal
 	};
 	
     //since this operator has arguments
@@ -346,20 +346,20 @@ public :
 */
 
 //##ModelId=3B0C087402F5
-class RM_DUPLICATES : public LOG_OP
+class RMDuplicatesLogicalOperator : public LogicalOperator
 {
 	
 public :
 	
 	//##ModelId=3B0C08740300
-    RM_DUPLICATES();  
+    RMDuplicatesLogicalOperator();  
 	//##ModelId=3B0C08740309
-	RM_DUPLICATES( RM_DUPLICATES& Op);	
+	RMDuplicatesLogicalOperator( RMDuplicatesLogicalOperator& Op);	
 	//##ModelId=3B0C0874030B
-	OP * Clone() { return new RM_DUPLICATES(*this); };
+	Operator * Clone() { return new RMDuplicatesLogicalOperator(*this); };
 	
 	//##ModelId=3B0C08740313
-	~RM_DUPLICATES() 
+	~RMDuplicatesLogicalOperator() 
 	{ if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_RM_DUPLICATES].Delete();	};
 	
 	//##ModelId=3B0C08740314
@@ -372,7 +372,7 @@ public :
 	//##ModelId=3B0C08740328
 	inline int GetNameId() {return RM_DUPLICATES_ID; };   //Name of this operator
 	//##ModelId=3B0C08740331
-	inline bool operator== (OP * other)
+	inline bool operator== (Operator * other)
 	{
 		return ( other->GetNameId() == GetNameId() ); 
 	};
@@ -404,7 +404,7 @@ public :
 */
 
 //##ModelId=3B0C08750043
-class AGG_LIST : public LOG_OP
+class AggregateListLogicalOperator : public LogicalOperator
 {
 public:
 	//##ModelId=3B0C08750057
@@ -419,9 +419,9 @@ public:
 	int FAttsSize;
 	
 	//##ModelId=3B0C0875009D
-    AGG_LIST(int * gby_atts, int gby_size, AGG_OP_ARRAY * agg_ops);  
+    AggregateListLogicalOperator(int * gby_atts, int gby_size, AGG_OP_ARRAY * agg_ops);  
 	//##ModelId=3B0C087500B1
-	AGG_LIST( AGG_LIST& Op)
+	AggregateListLogicalOperator( AggregateListLogicalOperator& Op)
 		:GbyAtts(CopyArray(Op.GbyAtts, Op.GbySize)), GbySize(Op.GbySize),
 		FAttsSize(Op.FAttsSize), FlattenedAtts(CopyArray(Op.FlattenedAtts, Op.FAttsSize))
 	{	
@@ -435,10 +435,10 @@ public:
 	};
 	
 	//##ModelId=3B0C087500BB
-	OP * Clone() { return new AGG_LIST(*this); };
+	Operator * Clone() { return new AggregateListLogicalOperator(*this); };
 	
 	//##ModelId=3B0C087500BC
-	~AGG_LIST() 
+	~AggregateListLogicalOperator() 
 	{	
 		delete [] GbyAtts;
 		for (int i=0; i<AggOps->GetSize(); i++) delete (*AggOps)[i];
@@ -457,7 +457,7 @@ public:
 	//##ModelId=3B0C087500DA
 	inline int GetNameId() {return AGG_LIST_ID; };   //Name of this operator
 	//##ModelId=3B0C087500DB
-	bool operator== (OP * other);
+	bool operator== (Operator * other);
 	
     //since this operator has arguments
 	//##ModelId=3B0C087500EE
@@ -478,7 +478,7 @@ public:
 */
 
 //##ModelId=3B0C087501CA
-class FUNC_OP : public LOG_OP
+class FunctionLogicalOperator : public LogicalOperator
 {
 public:
 	//##ModelId=3B0C087501DF
@@ -489,21 +489,21 @@ public:
 	int AttsSize;
 	
 	//##ModelId=3B0C087501FC
-	FUNC_OP(CString range_var, int * atts, int size)
+	FunctionLogicalOperator(CString range_var, int * atts, int size)
 		: RangeVar(range_var), Atts(atts), AttsSize(size)
 	{	if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_FUNC_OP].New(); };
 	
 	//##ModelId=3B0C08750209
-	FUNC_OP( FUNC_OP& Op )
+	FunctionLogicalOperator( FunctionLogicalOperator& Op )
 		: RangeVar(Op.RangeVar), Atts( CopyArray(Op.Atts, Op.AttsSize) ), 
 		AttsSize(Op.AttsSize)
 	{	if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_FUNC_OP].New();};
 	
 	//##ModelId=3B0C08750211
-	OP * Clone() {	return new FUNC_OP(*this); };
+	Operator * Clone() {	return new FunctionLogicalOperator(*this); };
 	
 	//##ModelId=3B0C0875021A
-	~FUNC_OP() 
+	~FunctionLogicalOperator() 
 	{	delete [] Atts;
 	    if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_FUNC_OP].Delete();
 	};
@@ -518,11 +518,11 @@ public:
 	//##ModelId=3B0C08750242
 	inline int GetNameId() { return FUNC_OP_ID; };
 	//##ModelId=3B0C0875024C
-	inline bool operator== (OP * other)
+	inline bool operator== (Operator * other)
 	{
 		return ( other->GetNameId() == GetNameId() &&
-			EqualArray( ((FUNC_OP*)other)->Atts, Atts, AttsSize) &&  //arguments are equal
-			((FUNC_OP*)other)->RangeVar == RangeVar);
+			EqualArray( ((FunctionLogicalOperator*)other)->Atts, Atts, AttsSize) &&  //arguments are equal
+			((FunctionLogicalOperator*)other)->RangeVar == RangeVar);
 	};
 	
 	//since this operator has arguments

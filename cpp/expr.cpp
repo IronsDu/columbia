@@ -19,7 +19,7 @@ Supported by NSF Grants IRI-9610013 and IRI-9619977
 #endif
 
 //##ModelId=3B0C086E007F
-EXPR::EXPR(OP * LogOp, EXPR * First, EXPR * Second, 
+EXPR::EXPR(Operator * LogOp, EXPR * First, EXPR * Second, 
 		   EXPR * Third, EXPR * Fourth)
 		   :Op(LogOp), arity(0)
 {
@@ -41,7 +41,7 @@ EXPR::EXPR(OP * LogOp, EXPR * First, EXPR * Second,
 };
 
 //##ModelId=3B0C086E00A7
-EXPR::EXPR(OP * Op, EXPR ** inputs)
+EXPR::EXPR(Operator * Op, EXPR ** inputs)
 :Op(Op), Inputs(inputs), arity( Op->GetArity())
 
 { if (TraceOn&& !ForGlobalEpsPruning) ClassStat[C_EXPR].New(); };

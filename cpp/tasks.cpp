@@ -667,7 +667,7 @@ void O_GROUP::perform ()
 		//We can only calculate cost for physical operators
 		
 		//Cache local properties
-		OP * Op =  (PHYS_OP *)(MExpr -> GetOp());	// the op of the expr
+		Operator * Op =  (PhysicalOperator *)(MExpr -> GetOp());	// the op of the expr
 		arity = Op -> GetArity();			// cache arity of mexpr
 		
         // create the arrays of input costs and logical properties
@@ -813,7 +813,7 @@ void O_INPUTS::perform ()
 	
 	//Cache local properties of G and the expression being optimized
 	
-	OP * Op = MExpr ->GetOp();  //the op of the expr
+	Operator * Op = MExpr ->GetOp();  //the op of the expr
 	assert(Op -> is_physical() );
 	EXP_GROUP *	LocalGroup = Ssp -> GetGroup(MExpr -> GetGrpID());	//Group of the MExpr
     
@@ -892,7 +892,7 @@ void O_INPUTS::perform ()
 			if (Op->is_physical())
 			{
 				// Determine property required of that input
-				ReqProp = ((PHYS_OP *)Op)->InputReqdProp
+				ReqProp = ((PhysicalOperator *)Op)->InputReqdProp
 					(LocalReqdProp, InputLogProp[input], input, possible);
 				
 				if( ! possible )  // if not possible, means no such input prop can satisfied
@@ -997,7 +997,7 @@ void O_INPUTS::perform ()
 			if (Op->is_physical())
 			{
 				// Determine property required of that input
-				ReqProp = ((PHYS_OP *)Op)->InputReqdProp
+				ReqProp = ((PhysicalOperator *)Op)->InputReqdProp
 					(LocalReqdProp, InputLogProp[input], input, possible);
 				
 				if(Pruning) assert(possible);	// should be possible since in the first pass, we checked it
@@ -1190,7 +1190,7 @@ void O_INPUTS::perform ()
 		// satisfy this required property.
 		if( arity ==0 && LocalReqdProp->GetOrder()!= any && Op->is_physical())
 		{
-			PHYS_PROP * OutputPhysProp = ((PHYS_OP *)Op)->FindPhysProp();
+			PHYS_PROP * OutputPhysProp = ((PhysicalOperator *)Op)->FindPhysProp();
 			if( !(*LocalReqdProp == *OutputPhysProp) )
 			{
 				PTRACE2("physical epxr: %s does not satisfy required phys_prop: %s", 

@@ -39,7 +39,7 @@ In Columbia, ATTR_OP is 1, ATTR is 2.a, and ATTR_EXP is 2.b .
 
 //ATTR_OP represents the value of an attribute, as in emp.age < 40
 //##ModelId=3B0C0875027E
-class ATTR_OP : public ITEM_OP
+class ATTR_OP : public ItemOperator
 {
 private:	
 	//##ModelId=3B0C08750292
@@ -55,7 +55,7 @@ public:
 	{	if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_ATTR_OP].New();};
 	
 	//##ModelId=3B0C087502B0
-	OP * Clone() {	return new ATTR_OP(*this); };
+	Operator * Clone() {	return new ATTR_OP(*this); };
 	
 	//##ModelId=3B0C087502B1
 	~ATTR_OP() 
@@ -80,7 +80,7 @@ public:
 };
 
 //##ModelId=3B0C08750328
-class ATTR_EXP : public ITEM_OP
+class ATTR_EXP : public ItemOperator
 {
 private:
 	//##ModelId=3B0C0875033C
@@ -105,7 +105,7 @@ public:
 	};
 	
 	//##ModelId=3B0C08750397
-	OP * Clone() {	return new ATTR_EXP(*this); };
+	Operator * Clone() {	return new ATTR_EXP(*this); };
 	
 	//##ModelId=3B0C08750398
 	~ATTR_EXP() 
@@ -135,7 +135,7 @@ public:
 
 // constant op
 //##ModelId=3B0C087503DD
-class CONST_OP : public ITEM_OP
+class CONST_OP : public ItemOperator
 {
 public:
 	//##ModelId=3B0C08760009
@@ -163,7 +163,7 @@ public :
 	{	if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_CONST_INT_OP].New();};
 	
 	//##ModelId=3B0C08760077
-	OP * Clone() { return new CONST_INT_OP(*this); };
+	Operator * Clone() { return new CONST_INT_OP(*this); };
 	
 	//##ModelId=3B0C08760078
 	~CONST_INT_OP() 
@@ -203,7 +203,7 @@ public :
 	{	if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_CONST_STR_OP].New();};
 	
 	//##ModelId=3B0C08760121
-	OP * Clone() { return new CONST_STR_OP(*this); };
+	Operator * Clone() { return new CONST_STR_OP(*this); };
 	
 	//##ModelId=3B0C08760122
 	~CONST_STR_OP() 
@@ -246,7 +246,7 @@ public :
 	{	if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_CONST_SET_OP].New();};
 	
 	//##ModelId=3B0C087601C3
-	OP * Clone() { return new CONST_SET_OP(*this); };
+	Operator * Clone() { return new CONST_SET_OP(*this); };
 	
 	//##ModelId=3B0C087601CB
 	~CONST_SET_OP() 
@@ -271,7 +271,7 @@ public :
 
 //Boolean Operator
 //##ModelId=3B0C087601FD
-class BOOLE_OP : public ITEM_OP
+class BOOLE_OP : public ItemOperator
 {
 	
 private:
@@ -310,7 +310,7 @@ public :
 	{	if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_COMP_OP].New();};
 	
 	//##ModelId=3B0C087602D0
-	OP * Clone() { return new COMP_OP (*this); };
+	Operator * Clone() { return new COMP_OP (*this); };
 	
 	//##ModelId=3B0C087602D1
 	~COMP_OP () 

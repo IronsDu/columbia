@@ -16,18 +16,18 @@ Columbia Optimizer Framework
 
 #include "op.h"
 
-class FILE_SCAN;
-class LOOPS_JOIN;
-class LOOPS_INDEX_JOIN;
-class MERGE_JOIN;
-class P_PROJECT;
-class FILTER;
-class INDEXED_FILTER;
-class QSORT;
-class HASH_DUPLICATES;
-class HGROUP_LIST;
-class P_FUNC_OP;
-class BIT_JOIN;
+class FileScanPhysicalOperator;
+class LoopsJoinPhysicalOperator;
+class LoopsIndexJoinPhysicalOperator;
+class MergeJoinPhysicalOperator;
+class ProjectPhysicalOperator;
+class FilterPhysicalOperator;
+class IndexedFilterPhysicalOperator;
+class QsortPhysicalOperator;
+class HashDuplicatesPhysicalOperator;
+class HashAggListPhysicalOperator;
+class FunctionPhysicalOperator;
+class BitJoinPhysicalOperator;
 
 /*
 File scan
@@ -35,20 +35,20 @@ File scan
 Physical version of GET.  Retrieves all data from the specified file.
 */
 //##ModelId=3B0C086E013E
-class FILE_SCAN : public PHYS_OP
+class FileScanPhysicalOperator : public PhysicalOperator
 {
 public:
 
 	//##ModelId=3B0C086E0149
-	FILE_SCAN(int fileId);
+	FileScanPhysicalOperator(int fileId);
 	//##ModelId=3B0C086E0153
-	FILE_SCAN(FILE_SCAN& Op);
+	FileScanPhysicalOperator(FileScanPhysicalOperator& Op);
 
 	//##ModelId=3B0C086E015D
-	inline OP* Clone() { return new FILE_SCAN(*this); };
+	inline Operator* Clone() { return new FileScanPhysicalOperator(*this); };
 
 	//##ModelId=3B0C086E0166
-	~FILE_SCAN() { if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_FILE_SCAN].Delete(); };
+	~FileScanPhysicalOperator() { if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_FILE_SCAN].Delete(); };
 
 	//##ModelId=3B0C086E0170
 	COST* FindLocalCost(
@@ -99,7 +99,7 @@ private:
    A physical version of EQJOIN.  Nested loops, not index nested loops.
 */
 //##ModelId=3B0C086E0210
-class LOOPS_JOIN : public PHYS_OP
+class LoopsJoinPhysicalOperator : public PhysicalOperator
 {
 public:
 	//##ModelId=3B0C086E0224
@@ -112,15 +112,15 @@ public:
 public:
 
 	//##ModelId=3B0C086E0242
-	LOOPS_JOIN(int* lattrs, int* rattrs, int size);
+	LoopsJoinPhysicalOperator(int* lattrs, int* rattrs, int size);
 	//##ModelId=3B0C086E0256
-	LOOPS_JOIN(LOOPS_JOIN& Op);
+	LoopsJoinPhysicalOperator(LoopsJoinPhysicalOperator& Op);
 
 	//##ModelId=3B0C086E0260
-	inline OP* Clone() { return new LOOPS_JOIN(*this); };
+	inline Operator* Clone() { return new LoopsJoinPhysicalOperator(*this); };
 
 	//##ModelId=3B0C086E026A
-	~LOOPS_JOIN()
+	~LoopsJoinPhysicalOperator()
 	{
 		if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_LOOPS_JOIN].Delete();
 		delete[] lattrs;
@@ -170,21 +170,21 @@ public:
 // Physical Dummy Operator.  Just to give the dummy operator a physical counterpart.
 
 //##ModelId=3B0C086E0314
-class PDUMMY : public PHYS_OP
+class DummyPhysicalOperator : public PhysicalOperator
 {
 
 public:
 
 	//##ModelId=3B0C086E031F
-	PDUMMY();
+	DummyPhysicalOperator();
 	//##ModelId=3B0C086E0328
-	PDUMMY(PDUMMY& Op);
+	DummyPhysicalOperator(DummyPhysicalOperator& Op);
 
 	//##ModelId=3B0C086E0333
-	inline OP* Clone() { return new PDUMMY(*this); };
+	inline Operator* Clone() { return new DummyPhysicalOperator(*this); };
 
 	//##ModelId=3B0C086E033C
-	~PDUMMY()
+	~DummyPhysicalOperator()
 	{	};
 
 	//##ModelId=3B0C086E0346
@@ -211,7 +211,7 @@ public:
 */
 
 //##ModelId=3B0C086E03DD
-class LOOPS_INDEX_JOIN : public PHYS_OP
+class LoopsIndexJoinPhysicalOperator : public PhysicalOperator
 {
 public:
 	//##ModelId=3B0C086F0009
@@ -226,15 +226,15 @@ public:
 public:
 
 	//##ModelId=3B0C086F0031
-	LOOPS_INDEX_JOIN(int* lattrs, int* rattrs, int size, int CollId);
+	LoopsIndexJoinPhysicalOperator(int* lattrs, int* rattrs, int size, int CollId);
 	//##ModelId=3B0C086F0045
-	LOOPS_INDEX_JOIN(LOOPS_INDEX_JOIN& Op);
+	LoopsIndexJoinPhysicalOperator(LoopsIndexJoinPhysicalOperator& Op);
 
 	//##ModelId=3B0C086F004F
-	inline OP* Clone() { return new LOOPS_INDEX_JOIN(*this); };
+	inline Operator* Clone() { return new LoopsIndexJoinPhysicalOperator(*this); };
 
 	//##ModelId=3B0C086F0050
-	~LOOPS_INDEX_JOIN()
+	~LoopsIndexJoinPhysicalOperator()
 	{
 		if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_LOOPS_INDEX_JOIN].Delete();
 		delete[] lattrs;
@@ -266,7 +266,7 @@ public:
 */
 
 //##ModelId=3B0C086F010D
-class MERGE_JOIN : public PHYS_OP
+class MergeJoinPhysicalOperator : public PhysicalOperator
 {
 
 public:
@@ -280,16 +280,16 @@ public:
 public:
 
 	//##ModelId=3B0C086F013F
-	MERGE_JOIN(int* lattrs, int* rattrs, int size);
+	MergeJoinPhysicalOperator(int* lattrs, int* rattrs, int size);
 
 	//##ModelId=3B0C086F014B
-	MERGE_JOIN(MERGE_JOIN& Op);
+	MergeJoinPhysicalOperator(MergeJoinPhysicalOperator& Op);
 
 	//##ModelId=3B0C086F0154
-	inline OP* Clone() { return new MERGE_JOIN(*this); };
+	inline Operator* Clone() { return new MergeJoinPhysicalOperator(*this); };
 
 	//##ModelId=3B0C086F015D
-	~MERGE_JOIN()
+	~MergeJoinPhysicalOperator()
 	{
 		if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_MERGE_JOIN].Delete();
 		delete[] lattrs;
@@ -317,7 +317,7 @@ public:
 
 //Does not require its inputs to be hashed
 //##ModelId=3B0C086F0225
-class HASH_JOIN : public PHYS_OP
+class HashJoinPhysicalOperator : public PhysicalOperator
 {
 
 public:
@@ -326,15 +326,15 @@ public:
 	int	size;				// the number of attrs
 
 	//##ModelId=3B0C086F0239
-	HASH_JOIN(int* lattrs, int* rattrs, int size);
+	HashJoinPhysicalOperator(int* lattrs, int* rattrs, int size);
 	//##ModelId=3B0C086F024D
-	HASH_JOIN(HASH_JOIN& Op);
+	HashJoinPhysicalOperator(HashJoinPhysicalOperator& Op);
 
 	//##ModelId=3B0C086F024F
-	inline OP* Clone() { return new HASH_JOIN(*this); };
+	inline Operator* Clone() { return new HashJoinPhysicalOperator(*this); };
 
 	//##ModelId=3B0C086F0257
-	~HASH_JOIN()
+	~HashJoinPhysicalOperator()
 	{
 		if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_HASH_JOIN].Delete();
 		delete[] lattrs;
@@ -358,7 +358,7 @@ public:
 
 }; // HASH_JOIN
 //##ModelId=3B0C086F0320
-class P_PROJECT : public PHYS_OP
+class ProjectPhysicalOperator : public PhysicalOperator
 {
 
 public:
@@ -371,15 +371,15 @@ public:
 public:
 
 	//##ModelId=3B0C086F0348
-	P_PROJECT(int* attrs, int size);
+	ProjectPhysicalOperator(int* attrs, int size);
 	//##ModelId=3B0C086F0352
-	P_PROJECT(P_PROJECT& Op);
+	ProjectPhysicalOperator(ProjectPhysicalOperator& Op);
 
 	//##ModelId=3B0C086F035C
-	inline OP* Clone() { return new P_PROJECT(*this); };
+	inline Operator* Clone() { return new ProjectPhysicalOperator(*this); };
 
 	//##ModelId=3B0C086F0366
-	~P_PROJECT()
+	~ProjectPhysicalOperator()
 	{
 		if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_P_PROJECT].Delete();
 		delete[] attrs;
@@ -410,20 +410,20 @@ public:
 */
 
 //##ModelId=3B0C08700028
-class FILTER : public PHYS_OP
+class FilterPhysicalOperator : public PhysicalOperator
 {
 
 public:
 
 	//##ModelId=3B0C08700033
-	FILTER() { if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_FILTER].New(); };
+	FilterPhysicalOperator() { if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_FILTER].New(); };
 	//##ModelId=3B0C0870003C
-	FILTER(FILTER& Op) { if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_FILTER].New(); };
+	FilterPhysicalOperator(FilterPhysicalOperator& Op) { if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_FILTER].New(); };
 	//##ModelId=3B0C0870003E
-	~FILTER() { if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_FILTER].Delete(); };
+	~FilterPhysicalOperator() { if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_FILTER].Delete(); };
 
 	//##ModelId=3B0C08700046
-	inline OP* Clone() { return new FILTER(*this); };
+	inline Operator* Clone() { return new FilterPhysicalOperator(*this); };
 
 	//##ModelId=3B0C08700050
 	COST* FindLocalCost(
@@ -450,21 +450,21 @@ public:
 */
 
 //##ModelId=3B0C08700122
-class QSORT : public PHYS_OP
+class QsortPhysicalOperator : public PhysicalOperator
 {
 public:
 
 	//##ModelId=3B0C08700136
-	QSORT();
+	QsortPhysicalOperator();
 
 	//##ModelId=3B0C08700140
-	QSORT(QSORT& Op);
+	QsortPhysicalOperator(QsortPhysicalOperator& Op);
 
 	//##ModelId=3B0C08700142
-	inline OP* Clone() { return new QSORT(*this); };
+	inline Operator* Clone() { return new QsortPhysicalOperator(*this); };
 
 	//##ModelId=3B0C0870014B
-	~QSORT()
+	~QsortPhysicalOperator()
 	{
 		if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_QSORT].Delete();
 	};
@@ -488,20 +488,20 @@ public:
 }; // QSORT
 
 //##ModelId=3B0C08700213
-class HASH_DUPLICATES : public PHYS_OP
+class HashDuplicatesPhysicalOperator : public PhysicalOperator
 {
 public:
 
 	//##ModelId=3B0C08700227
-	HASH_DUPLICATES() { if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_HASH_DUPLICATES].New(); };
+	HashDuplicatesPhysicalOperator() { if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_HASH_DUPLICATES].New(); };
 	//##ModelId=3B0C08700228
-	HASH_DUPLICATES(HASH_DUPLICATES& Op) { if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_HASH_DUPLICATES].New(); };
+	HashDuplicatesPhysicalOperator(HashDuplicatesPhysicalOperator& Op) { if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_HASH_DUPLICATES].New(); };
 
 	//##ModelId=3B0C08700231
-	inline OP* Clone() { return new HASH_DUPLICATES(*this); };
+	inline Operator* Clone() { return new HashDuplicatesPhysicalOperator(*this); };
 
 	//##ModelId=3B0C08700232
-	~HASH_DUPLICATES()
+	~HashDuplicatesPhysicalOperator()
 	{
 		if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_HASH_DUPLICATES].Delete();
 	};
@@ -527,7 +527,7 @@ public:
 
 //Hash-based AGG_LIST
 //##ModelId=3B0C0870033F
-class HGROUP_LIST : public PHYS_OP
+class HashAggListPhysicalOperator : public PhysicalOperator
 {
 public:
 	//##ModelId=3B0C08700354
@@ -540,14 +540,14 @@ public:
 public:
 
 	//##ModelId=3B0C0870037B
-	HGROUP_LIST(int* gby_atts, int gby_size, AGG_OP_ARRAY* agg_ops)
+	HashAggListPhysicalOperator(int* gby_atts, int gby_size, AGG_OP_ARRAY* agg_ops)
 		:GbyAtts(gby_atts), GbySize(gby_size), AggOps(agg_ops)
 	{
 		if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_HGROUP_LIST].New();
 	};
 
 	//##ModelId=3B0C08700387
-	HGROUP_LIST(HGROUP_LIST& Op)
+	HashAggListPhysicalOperator(HashAggListPhysicalOperator& Op)
 		:GbyAtts(CopyArray(Op.GbyAtts, Op.GbySize)), GbySize(Op.GbySize)
 	{
 		AggOps = new AGG_OP_ARRAY;
@@ -560,10 +560,10 @@ public:
 	};
 
 	//##ModelId=3B0C08700390
-	inline OP* Clone() { return new HGROUP_LIST(*this); };
+	inline Operator* Clone() { return new HashAggListPhysicalOperator(*this); };
 
 	//##ModelId=3B0C08700399
-	~HGROUP_LIST()
+	~HashAggListPhysicalOperator()
 	{
 		for (int i = 0; i < AggOps->GetSize(); i++) delete (*AggOps)[i];
 		delete AggOps;
@@ -592,7 +592,7 @@ public:
 }; // HASH_DUPLICATES
 
 //##ModelId=3B0C087100CA
-class P_FUNC_OP : public PHYS_OP
+class FunctionPhysicalOperator : public PhysicalOperator
 {
 public:
 	//##ModelId=3B0C087100DE
@@ -603,24 +603,24 @@ public:
 	int AttsSize;
 
 	//##ModelId=3B0C087100FC
-	P_FUNC_OP(CString range_var, int* atts, int size)
+	FunctionPhysicalOperator(CString range_var, int* atts, int size)
 		:RangeVar(range_var), Atts(atts), AttsSize(size)
 	{
 		if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_P_FUNC_OP].New();
 	};
 
 	//##ModelId=3B0C08710109
-	P_FUNC_OP(P_FUNC_OP& Op)
+	FunctionPhysicalOperator(FunctionPhysicalOperator& Op)
 		:RangeVar(Op.RangeVar), Atts(CopyArray(Op.Atts, Op.AttsSize)), AttsSize(Op.AttsSize)
 	{
 		if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_P_FUNC_OP].New();
 	};
 
 	//##ModelId=3B0C08710111
-	inline OP* Clone() { return new P_FUNC_OP(*this); };
+	inline Operator* Clone() { return new FunctionPhysicalOperator(*this); };
 
 	//##ModelId=3B0C0871011A
-	~P_FUNC_OP()
+	~FunctionPhysicalOperator()
 	{
 		delete[] Atts;
 		if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_P_FUNC_OP].Delete();
@@ -651,7 +651,7 @@ public:
 */
 
 //##ModelId=3B0C08710278
-class BIT_JOIN : public PHYS_OP
+class BitJoinPhysicalOperator : public PhysicalOperator
 {
 public:
 	//##ModelId=3B0C0871028C
@@ -666,15 +666,15 @@ public:
 public:
 
 	//##ModelId=3B0C087102B4
-	BIT_JOIN(int* lattrs, int* rattrs, int size, int CollId);
+	BitJoinPhysicalOperator(int* lattrs, int* rattrs, int size, int CollId);
 	//##ModelId=3B0C087102C1
-	BIT_JOIN(BIT_JOIN& Op);
+	BitJoinPhysicalOperator(BitJoinPhysicalOperator& Op);
 
 	//##ModelId=3B0C087102C9
-	inline OP* Clone() { return new BIT_JOIN(*this); };
+	inline Operator* Clone() { return new BitJoinPhysicalOperator(*this); };
 
 	//##ModelId=3B0C087102D3
-	~BIT_JOIN()
+	~BitJoinPhysicalOperator()
 	{
 		if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_BIT_JOIN].Delete();
 		delete[] lattrs;
@@ -708,20 +708,20 @@ public:
 */
 
 //##ModelId=3B0C0872002B
-class INDEXED_FILTER : public PHYS_OP
+class IndexedFilterPhysicalOperator : public PhysicalOperator
 {
 
 public:
 
 	//##ModelId=3B0C08720036
-	INDEXED_FILTER(const int fileId);
+	IndexedFilterPhysicalOperator(const int fileId);
 	//##ModelId=3B0C0872003F
-	INDEXED_FILTER(INDEXED_FILTER& Op);
+	IndexedFilterPhysicalOperator(IndexedFilterPhysicalOperator& Op);
 	//##ModelId=3B0C08720049
-	~INDEXED_FILTER() { if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_INDEXED_FILTER].Delete(); };
+	~IndexedFilterPhysicalOperator() { if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_INDEXED_FILTER].Delete(); };
 
 	//##ModelId=3B0C0872004A
-	inline OP* Clone() { return new INDEXED_FILTER(*this); };
+	inline Operator* Clone() { return new IndexedFilterPhysicalOperator(*this); };
 
 	//##ModelId=3B0C08720053
 	COST* FindLocalCost(

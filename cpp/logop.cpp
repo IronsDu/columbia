@@ -23,7 +23,7 @@ as defined in logop.h
 
 /*********** GET functions ****************/
 //##ModelId=3B0C087301FB
-GET::GET(int collId)
+GetLogicalOperator::GetLogicalOperator(int collId)
 	:CollId(collId) 
 {
 	if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_GET].New();
@@ -33,7 +33,7 @@ GET::GET(int collId)
 };
 
 //##ModelId=3B0C087301F0
-GET::GET ( CString collection,  CString rangeVar)
+GetLogicalOperator::GetLogicalOperator ( CString collection,  CString rangeVar)
 {
 	SET_TRACE Trace(true);
 	RangeVar = rangeVar;
@@ -121,7 +121,7 @@ GET::GET ( CString collection,  CString rangeVar)
 }
 
 //##ModelId=3B0C08730204
-GET::GET( GET& Op )
+GetLogicalOperator::GetLogicalOperator( GetLogicalOperator& Op )
 	:CollId(Op.GetCollection())
 {
 	if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_GET].New();
@@ -131,7 +131,7 @@ GET::GET( GET& Op )
 }
 
 //##ModelId=3B0C0873024A
-CString GET::Dump()
+CString GetLogicalOperator::Dump()
 {
 	CString os;
 	os.Format("%s%s%s%s",GetName(),"(" , GetCollName(CollId) , ")");
@@ -141,7 +141,7 @@ CString GET::Dump()
 // find the logical property of the collection, 
 // also check the schema
 //##ModelId=3B0C08730218
-LOG_PROP* GET::FindLogProp (LOG_PROP ** input)
+LOG_PROP* GetLogicalOperator::FindLogProp (LOG_PROP ** input)
 {
 	COLL_PROP* CollProp = Cat->GetCollProp(CollId);
 	assert(CollProp!=NULL);
@@ -186,7 +186,7 @@ LOG_PROP* GET::FindLogProp (LOG_PROP ** input)
 }
 
 //##ModelId=3B0C08730253
-ub4 GET::hash()
+ub4 GetLogicalOperator::hash()
 {
 	ub4 hashval = GetInitval();
 	
@@ -198,7 +198,7 @@ ub4 GET::hash()
 
 /*********** EQJOIN functions ****************/
 //##ModelId=3B0C08730311
-EQJOIN::EQJOIN(int *lattrs, int *rattrs, int size)
+EQJoinLogicalOperator::EQJoinLogicalOperator(int *lattrs, int *rattrs, int size)
 :lattrs(lattrs),rattrs(rattrs), size(size)
 {
 	if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_EQJOIN].New();
@@ -209,7 +209,7 @@ EQJOIN::EQJOIN(int *lattrs, int *rattrs, int size)
 };
 
 //##ModelId=3B0C08730326
-EQJOIN::EQJOIN( EQJOIN& Op)
+EQJoinLogicalOperator::EQJoinLogicalOperator( EQJoinLogicalOperator& Op)
 :lattrs( CopyArray(Op.lattrs,Op.size) ), 
 rattrs( CopyArray(Op.rattrs,Op.size) ), 
 size(Op.size)
@@ -222,7 +222,7 @@ size(Op.size)
 };
 
 //##ModelId=3B0C08730363
-CString EQJOIN::Dump()
+CString EQJoinLogicalOperator::Dump()
 {
 	CString os;
 	CString temp;
@@ -261,7 +261,7 @@ CString EQJOIN::Dump()
 }
 
 //##ModelId=3B0C08730331
-LOG_PROP* EQJOIN::FindLogProp (LOG_PROP ** input)
+LOG_PROP* EQJoinLogicalOperator::FindLogProp (LOG_PROP ** input)
 {
 	LOG_COLL_PROP* Left = (LOG_COLL_PROP*)(input[0]);
 	LOG_COLL_PROP* Right = (LOG_COLL_PROP*)(input[1]);
@@ -463,7 +463,7 @@ LOG_PROP* EQJOIN::FindLogProp (LOG_PROP ** input)
 }
 
 //##ModelId=3B0C08730362
-ub4 EQJOIN::hash()
+ub4 EQJoinLogicalOperator::hash()
 {
     ub4 hashval = GetInitval();
 	
@@ -477,7 +477,7 @@ ub4 EQJOIN::hash()
 }
 /*********** DUMMY functions ****************/
 //##ModelId=3B0C0874002F
-DUMMY::DUMMY()
+DummyLogicalOperator::DummyLogicalOperator()
 {
 #ifdef _DEBUG
 	name = GetName();		// for debug
@@ -486,7 +486,7 @@ DUMMY::DUMMY()
 };
 
 //##ModelId=3B0C08740030
-DUMMY::DUMMY( DUMMY& Op)
+DummyLogicalOperator::DummyLogicalOperator( DummyLogicalOperator& Op)
 
 {
 #ifdef _DEBUG
@@ -496,7 +496,7 @@ DUMMY::DUMMY( DUMMY& Op)
 };
 
 //##ModelId=3B0C08740074
-CString DUMMY::Dump()
+CString DummyLogicalOperator::Dump()
 {
 	CString os;
 	os.Format("%s",GetName());
@@ -504,7 +504,7 @@ CString DUMMY::Dump()
 }
 
 //##ModelId=3B0C08740043
-LOG_PROP* DUMMY::FindLogProp (LOG_PROP ** input)
+LOG_PROP* DummyLogicalOperator::FindLogProp (LOG_PROP ** input)
 {
 	LOG_COLL_PROP* Left = (LOG_COLL_PROP*)(input[0]);
 	LOG_COLL_PROP* Right = (LOG_COLL_PROP*)(input[1]);
@@ -540,7 +540,7 @@ LOG_PROP* DUMMY::FindLogProp (LOG_PROP ** input)
 }
 
 //##ModelId=3B0C0874006B
-ub4 DUMMY::hash()
+ub4 DummyLogicalOperator::hash()
 {
     ub4 hashval = GetInitval();
 	
@@ -550,7 +550,7 @@ ub4 DUMMY::hash()
 /*********** PROJECT functions ****************/
 
 //##ModelId=3B0C08740205
-PROJECT::PROJECT(int *attrs, int size)
+ProjectLogicalOperator::ProjectLogicalOperator(int *attrs, int size)
 :attrs(attrs), size(size)
 {
 	if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_PROJECT].New();
@@ -561,7 +561,7 @@ PROJECT::PROJECT(int *attrs, int size)
 };
 
 //##ModelId=3B0C08740210
-PROJECT::PROJECT( PROJECT& Op)
+ProjectLogicalOperator::ProjectLogicalOperator( ProjectLogicalOperator& Op)
 :attrs( CopyArray(Op.attrs,Op.size) ), 
 size(Op.size)
 {
@@ -572,7 +572,7 @@ size(Op.size)
 };
 
 //##ModelId=3B0C0874024C
-ub4 PROJECT::hash()
+ub4 ProjectLogicalOperator::hash()
 {
     ub4 hashval = GetInitval();
 	
@@ -584,7 +584,7 @@ ub4 PROJECT::hash()
 }
 
 //##ModelId=3B0C08740223
-LOG_PROP* PROJECT::FindLogProp (LOG_PROP ** input)
+LOG_PROP* ProjectLogicalOperator::FindLogProp (LOG_PROP ** input)
 {
     float new_ucard=1, attr_cucard;
 	
@@ -627,7 +627,7 @@ LOG_PROP* PROJECT::FindLogProp (LOG_PROP ** input)
 } // PROJECT::FindLogProp
 
 //##ModelId=3B0C0874024D
-CString PROJECT::Dump()
+CString ProjectLogicalOperator::Dump()
 {
 	CString os;
 	CString temp;
@@ -648,7 +648,7 @@ CString PROJECT::Dump()
 }
 
 //##ModelId=3B0C08740101
-SELECT::SELECT()
+SelectLogicalOperator::SelectLogicalOperator()
 {
 	if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_SELECT].New();
 #ifdef _DEBUG
@@ -657,7 +657,7 @@ SELECT::SELECT()
 };
 
 //##ModelId=3B0C0874010A
-SELECT::SELECT( SELECT& Op)
+SelectLogicalOperator::SelectLogicalOperator( SelectLogicalOperator& Op)
 {
 	if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_SELECT].New();
 #ifdef _DEBUG
@@ -666,7 +666,7 @@ SELECT::SELECT( SELECT& Op)
 };
 
 //##ModelId=3B0C08740116
-LOG_PROP* SELECT::FindLogProp (LOG_PROP ** input)
+LOG_PROP* SelectLogicalOperator::FindLogProp (LOG_PROP ** input)
 {
     LOG_COLL_PROP * rel_input = (LOG_COLL_PROP *) input[0];
     LOG_ITEM_PROP * pred_input = (LOG_ITEM_PROP *) input[1];
@@ -712,7 +712,7 @@ LOG_PROP* SELECT::FindLogProp (LOG_PROP ** input)
 } // SELECT::FindLogProp
 
 //##ModelId=3B0C0874013D
-ub4 SELECT::hash()
+ub4 SelectLogicalOperator::hash()
 {
     ub4 hashval = GetInitval();
 	
@@ -720,13 +720,13 @@ ub4 SELECT::hash()
 }
 
 //##ModelId=3B0C08740146
-CString SELECT::Dump()
+CString SelectLogicalOperator::Dump()
 {
 	return GetName();
 }
 
 //##ModelId=3B0C08740300
-RM_DUPLICATES::RM_DUPLICATES()
+RMDuplicatesLogicalOperator::RMDuplicatesLogicalOperator()
 {
 	if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_RM_DUPLICATES].New();
 #ifdef _DEBUG
@@ -735,7 +735,7 @@ RM_DUPLICATES::RM_DUPLICATES()
 };
 
 //##ModelId=3B0C08740309
-RM_DUPLICATES::RM_DUPLICATES(RM_DUPLICATES & Op)
+RMDuplicatesLogicalOperator::RMDuplicatesLogicalOperator(RMDuplicatesLogicalOperator & Op)
 {
 	if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_RM_DUPLICATES].New();
 #ifdef _DEBUG
@@ -744,7 +744,7 @@ RM_DUPLICATES::RM_DUPLICATES(RM_DUPLICATES & Op)
 };
 
 //##ModelId=3B0C08740314
-LOG_PROP* RM_DUPLICATES::FindLogProp (LOG_PROP ** input)
+LOG_PROP* RMDuplicatesLogicalOperator::FindLogProp (LOG_PROP ** input)
 {
     LOG_COLL_PROP * rel_input = (LOG_COLL_PROP *) input[0];
     
@@ -774,7 +774,7 @@ LOG_PROP* RM_DUPLICATES::FindLogProp (LOG_PROP ** input)
 } // RM_DUPLICATES::FindLogProp
 
 //##ModelId=3B0C0874033C
-ub4 RM_DUPLICATES::hash()
+ub4 RMDuplicatesLogicalOperator::hash()
 {
     ub4 hashval = GetInitval();
 	
@@ -782,13 +782,13 @@ ub4 RM_DUPLICATES::hash()
 }
 
 //##ModelId=3B0C08740345
-CString RM_DUPLICATES::Dump()
+CString RMDuplicatesLogicalOperator::Dump()
 {
 	return GetName();
 }
 
 //##ModelId=3B0C0875009D
-AGG_LIST::AGG_LIST(int * gby_atts, int gby_size, AGG_OP_ARRAY * agg_ops)
+AggregateListLogicalOperator::AggregateListLogicalOperator(int * gby_atts, int gby_size, AGG_OP_ARRAY * agg_ops)
 :GbyAtts(gby_atts), GbySize(gby_size), AggOps(agg_ops)
 {
 	//produce a flattened list
@@ -821,7 +821,7 @@ AGG_LIST::AGG_LIST(int * gby_atts, int gby_size, AGG_OP_ARRAY * agg_ops)
 }
 
 //##ModelId=3B0C087500EE
-ub4 AGG_LIST::hash()
+ub4 AggregateListLogicalOperator::hash()
 {
     ub4 hashval = GetInitval();
 	int i;
@@ -842,7 +842,7 @@ ub4 AGG_LIST::hash()
 }
 
 //##ModelId=3B0C087500BD
-LOG_PROP* AGG_LIST::FindLogProp (LOG_PROP ** input)
+LOG_PROP* AggregateListLogicalOperator::FindLogProp (LOG_PROP ** input)
 {
 	LOG_COLL_PROP * rel_input = (LOG_COLL_PROP *) input[0];
 	SCHEMA * temp_schema = rel_input -> Schema -> projection( GbyAtts, GbySize);
@@ -920,7 +920,7 @@ LOG_PROP* AGG_LIST::FindLogProp (LOG_PROP ** input)
 } // AGG_LIST::FindLogProp
 
 //##ModelId=3B0C087500EF
-CString AGG_LIST::Dump()
+CString AggregateListLogicalOperator::Dump()
 {
 	CString os;
 	CString temp;
@@ -963,11 +963,11 @@ CString AGG_LIST::Dump()
 } //AGG_LIST::Dump
 
 //##ModelId=3B0C087500DB
-bool AGG_LIST::operator== (OP * other)
+bool AggregateListLogicalOperator::operator== (Operator * other)
 {
 	bool result;
 	result = other->GetNameId() == GetNameId() && 
-		EqualArray( ((AGG_LIST*)other)->GbyAtts, GbyAtts, GbySize) ;
+		EqualArray( ((AggregateListLogicalOperator*)other)->GbyAtts, GbyAtts, GbySize) ;
 	
 	// traverse the agg_ops
 	if (result)
@@ -975,7 +975,7 @@ bool AGG_LIST::operator== (OP * other)
 		int NumOps = AggOps->GetSize();
 		for (int i=0; i<NumOps && result; i++)
 		{
-			AGG_OP * oth_op = ( * ((AGG_LIST*)other)->AggOps)[i];
+			AGG_OP * oth_op = ( * ((AggregateListLogicalOperator*)other)->AggOps)[i];
 			AGG_OP * thi_op = ( * AggOps)[i];
 			
 			result = (oth_op == thi_op);
@@ -987,7 +987,7 @@ bool AGG_LIST::operator== (OP * other)
 }//AGG_LIST::==
 
 //##ModelId=3B0C08750224
-LOG_PROP* FUNC_OP::FindLogProp (LOG_PROP ** input)
+LOG_PROP* FunctionLogicalOperator::FindLogProp (LOG_PROP ** input)
 {
 	LOG_COLL_PROP * rel_input = (LOG_COLL_PROP *) input[0];
     SCHEMA * temp_schema = new SCHEMA(*(rel_input -> Schema));
@@ -1023,7 +1023,7 @@ LOG_PROP* FUNC_OP::FindLogProp (LOG_PROP ** input)
 } // FUNC_OP::FindLogProp
 
 //##ModelId=3B0C08750256
-ub4 FUNC_OP::hash()
+ub4 FunctionLogicalOperator::hash()
 {
     ub4 hashval = GetInitval();
     
@@ -1037,7 +1037,7 @@ ub4 FUNC_OP::hash()
 }
 
 //##ModelId=3B0C08750257
-CString FUNC_OP::Dump()
+CString FunctionLogicalOperator::Dump()
 {
 	CString os;
 	CString temp;

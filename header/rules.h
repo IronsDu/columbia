@@ -370,7 +370,7 @@ public:
 	inline EXPR* GetSubstitute() { return(substitute); };
 
 	//##ModelId=3B0C086903CB
-	bool top_match(OP* op_arg)
+	bool top_match(Operator* op_arg)
 	{
 		assert(op_arg->is_logical()); // to make sure never O_EXPR a physcial mexpr 
 
@@ -378,13 +378,13 @@ public:
 		if (original->GetOp()->is_leaf()) return true;
 
 		// otherwise, the original pattern should have a logical root op
-		return (((LOG_OP*)(original->GetOp()))->OpMatch((LOG_OP*)op_arg));
+		return (((LogicalOperator*)(original->GetOp()))->OpMatch((LogicalOperator*)op_arg));
 
 	};
 
 	// default value is 1.0, resulting in exhaustive search
 	//##ModelId=3B0C086903D5
-	virtual int promise(OP* op_arg, int ContextID)
+	virtual int promise(Operator* op_arg, int ContextID)
 	{
 		return (substitute->GetOp()->is_physical() ? PHYS_PROMISE : LOG_PROMISE);
 	};
@@ -454,7 +454,7 @@ public:
 	//##ModelId=3B0C086A00DE
 	EXPR* next_substitute(EXPR* before, PHYS_PROP* ReqdProp);
 	//##ModelId=3B0C086A00E8
-	int promise(OP* op_arg, int ContextID)
+	int promise(Operator* op_arg, int ContextID)
 	{
 		return FILESCAN_PROMISE;
 	};
@@ -496,7 +496,7 @@ public:
 	//##ModelId=3B0C086A0214
 	EQ_TO_MERGE();
 	//##ModelId=3B0C086A0215
-	int promise(OP* op_arg, int ContextID);
+	int promise(Operator* op_arg, int ContextID);
 	//##ModelId=3B0C086A0228
 	EXPR* next_substitute(EXPR* before, PHYS_PROP* ReqdProp);
 #ifdef CONDPRUNE
@@ -517,7 +517,7 @@ public:
 	//##ModelId=3B0C086A02B4
 	EQ_TO_HASH();
 	//##ModelId=3B0C086A02B5
-	int promise(OP* op_arg, int ContextID);
+	int promise(Operator* op_arg, int ContextID);
 	//##ModelId=3B0C086A02C8
 	EXPR* next_substitute(EXPR* before, PHYS_PROP* ReqdProp);
 }; // EQ_TO_HASH
@@ -576,7 +576,7 @@ public:
 	//##ModelId=3B0C086B00B7
 	bool condition(EXPR* before, M_EXPR* mexpr, int ContextID);
 	//##ModelId=3B0C086B00C3
-	int promise(OP* op_arg, int ContextID) { return ASSOC_PROMISE; };
+	int promise(Operator* op_arg, int ContextID) { return ASSOC_PROMISE; };
 
 }; // EQJOIN_LTOR
 
@@ -664,7 +664,7 @@ public:
 	~SORT_RULE() {};
 
 	//##ModelId=3B0C086C0041
-	int promise(OP* op_arg, int ContextID);
+	int promise(Operator* op_arg, int ContextID);
 
 	//##ModelId=3B0C086C004C
 	EXPR* next_substitute(EXPR* before, PHYS_PROP* ReqdProp);

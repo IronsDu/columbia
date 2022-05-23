@@ -228,7 +228,7 @@ EXPR * BINDERY::extract_expr ()
     // If original pattern is NULL something weird is happening.
     assert(original);
 	
-    OP * patt_op = original -> GetOp();
+    Operator * patt_op = original -> GetOp();
 	
     // Ensure that there has been a binding, so there is an 
     // expression to extract.
@@ -239,13 +239,13 @@ EXPR * BINDERY::extract_expr ()
     if (patt_op -> is_leaf ())
     {
         result = new EXPR (
-			new LEAF_OP(((LEAF_OP *)patt_op)->GetIndex(), group_no));
+			new LeafOperator(((LeafOperator *)patt_op)->GetIndex(), group_no));
     } // create leaf marked with group index
     else // general invocation of new EXPR
     {
 		//Top operator in the new EXPR will be top operator in cur_expr.  
 		//Get it.  (Probably could use patt_op here.)
-        OP * op_arg = cur_expr->GetOp()->Clone();
+        Operator * op_arg = cur_expr->GetOp()->Clone();
 		
 		//Need the arity of the top operator to construct inputs of new EXPR
         int arity = op_arg -> GetArity();
@@ -475,7 +475,7 @@ bool BINDERY::advance ()
 	
     assert(false); // should never terminate this loop
 #else
-	OP  * patt_op = original -> GetOp(); 
+	Operator  * patt_op = original -> GetOp(); 
 	// If the original pattern is a leaf, we will get one binding, 
 	//   to the entire group, then we will be done
 	if (patt_op -> is_leaf ())
@@ -506,7 +506,7 @@ bool BINDERY::advance ()
 		//PTRACE ("advancing the cur_expr: %s", cur_expr->Dump() );
 		
 		// cache some function results
-		OP  * op_arg = cur_expr -> GetOp();
+		Operator  * op_arg = cur_expr -> GetOp();
 		int arity = op_arg -> GetArity();
 		int input_no;
 		
@@ -649,8 +649,8 @@ Rule  Get -> File-scan
 //##ModelId=3B0C086A00CB
 GET_TO_FILE_SCAN::GET_TO_FILE_SCAN ()
 : RULE ("GET_TO_FILE_SCAN", 0,
-		new EXPR (new GET (0)),
-		new EXPR (new FILE_SCAN (0) ) ) 
+		new EXPR (new GetLogicalOperator (0)),
+		new EXPR (new FileScanPhysicalOperator (0) ) ) 
 {
 	// set rule index
 	set_index(R_GET_TO_FILE_SCAN);
@@ -663,7 +663,7 @@ EXPR * GET_TO_FILE_SCAN::next_substitute ( EXPR * before, PHYS_PROP * ReqdProp)
     EXPR * result;
 	
     // create transformed expression
-    result = new EXPR (new FILE_SCAN ( ((GET *)before->GetOp())->GetCollection() ) );
+    result = new EXPR (new FileScanPhysicalOperator ( ((GetLogicalOperator *)before->GetOp())->GetCollection() ) );
 	
     return result;
 }; // GET_TO_FILE_SCAN::next_substitute
@@ -676,13 +676,13 @@ EXPR * GET_TO_FILE_SCAN::next_substitute ( EXPR * before, PHYS_PROP * ReqdProp)
 //##ModelId=3B0C086A0161
 EQ_TO_LOOPS::EQ_TO_LOOPS ()
     : RULE ("EQJOIN->LOOPS_JOIN", 2,
-	    new EXPR (new EQJOIN (0,0,0),
-					  new EXPR (new LEAF_OP (0)),
-					  new EXPR (new LEAF_OP (1))
+	    new EXPR (new EQJoinLogicalOperator (0,0,0),
+					  new EXPR (new LeafOperator (0)),
+					  new EXPR (new LeafOperator (1))
 				  ),
-	     new EXPR (new LOOPS_JOIN (0,0,0),
-					  new EXPR (new LEAF_OP (0)),
-					  new EXPR (new LEAF_OP (1))
+	     new EXPR (new LoopsJoinPhysicalOperator (0,0,0),
+					  new EXPR (new LeafOperator (0)),
+					  new EXPR (new LeafOperator (1))
 				  )
 		    )
 {
@@ -694,13 +694,13 @@ EQ_TO_LOOPS::EQ_TO_LOOPS ()
 //##ModelId=3B0C086A0174
 EXPR * EQ_TO_LOOPS::next_substitute (EXPR * before,PHYS_PROP * ReqdProp)
 {
-	EQJOIN * Op = (EQJOIN *) before->GetOp();
+	EQJoinLogicalOperator * Op = (EQJoinLogicalOperator *) before->GetOp();
 	int size =  Op->size;
     int * lattrs = CopyArray ( Op->lattrs, size);
     int * rattrs = CopyArray ( Op->rattrs, size);
 	
     // create transformed expression
-    EXPR * result = new EXPR (new LOOPS_JOIN (lattrs, rattrs, size),
+    EXPR * result = new EXPR (new LoopsJoinPhysicalOperator (lattrs, rattrs, size),
 		new EXPR(*(before->GetInput(0))), 
 		new EXPR(*(before->GetInput(1)))
 					   );
@@ -729,12 +729,12 @@ bool EQ_TO_LOOPS::condition ( EXPR * before, M_EXPR *mexpr, int ContextID)
 //##ModelId=3B0C086A0342
 EQ_TO_LOOPS_INDEX::EQ_TO_LOOPS_INDEX ()
     : RULE ("EQJOIN -> LOOPS_INDEX_JOIN", 1,
-	    new EXPR (new EQJOIN (0, 0, 0),
-			new EXPR (new LEAF_OP (0)),
-			new EXPR (new GET(0))
+	    new EXPR (new EQJoinLogicalOperator (0, 0, 0),
+			new EXPR (new LeafOperator (0)),
+			new EXPR (new GetLogicalOperator(0))
 			),
-	    new EXPR (new LOOPS_INDEX_JOIN (0, 0, 0, 0),
-			new EXPR (new LEAF_OP (0))
+	    new EXPR (new LoopsIndexJoinPhysicalOperator (0, 0, 0, 0),
+			new EXPR (new LeafOperator (0))
 			)
 		)
 {
@@ -748,16 +748,16 @@ EXPR * EQ_TO_LOOPS_INDEX::next_substitute (EXPR * before,PHYS_PROP * ReqdProp)
 {
     EXPR * result;
 	
-	EQJOIN * Op = (EQJOIN *) before->GetOp();
+	EQJoinLogicalOperator * Op = (EQJoinLogicalOperator *) before->GetOp();
 	int size =  Op->size;
     int * lattrs = CopyArray ( Op->lattrs, size);
     int * rattrs = CopyArray ( Op->rattrs, size);
 	
     // Get the GET logical operator in order to get the indexed collection 
-    GET *g =  (GET *)before->GetInput(1)->GetOp();
+    GetLogicalOperator *g =  (GetLogicalOperator *)before->GetInput(1)->GetOp();
 	
     // create transformed expression
-    result = new EXPR (new LOOPS_INDEX_JOIN (lattrs, rattrs, size, g->GetCollection()),
+    result = new EXPR (new LoopsIndexJoinPhysicalOperator (lattrs, rattrs, size, g->GetCollection()),
 		new EXPR (*(before->GetInput(0)))
 		);
 	
@@ -772,13 +772,13 @@ EXPR * EQ_TO_LOOPS_INDEX::next_substitute (EXPR * before,PHYS_PROP * ReqdProp)
 bool EQ_TO_LOOPS_INDEX::condition ( EXPR * before, M_EXPR *mexpr, int ContextID)
 {
     // Get the GET logical operator in order to get the indexed collection 
-    GET *g =  (GET *)before->GetInput(1)->GetOp();
+    GetLogicalOperator *g =  (GetLogicalOperator *)before->GetInput(1)->GetOp();
 	INT_ARRAY * Indices = Cat->GetIndNames(g->GetCollection());
 	
 	if(Indices == NULL ) return false;
 	
-    int * rattrs = ((EQJOIN *) before -> GetOp()) -> rattrs ;
-	int size = ((EQJOIN *) before -> GetOp()) -> size ;
+    int * rattrs = ((EQJoinLogicalOperator *) before -> GetOp()) -> rattrs ;
+	int size = ((EQJoinLogicalOperator *) before -> GetOp()) -> size ;
 	
     // Loop thru indices
     for (int i=0; i < Indices->GetSize(); i++) 
@@ -799,13 +799,13 @@ bool EQ_TO_LOOPS_INDEX::condition ( EXPR * before, M_EXPR *mexpr, int ContextID)
 //##ModelId=3B0C086A0214
 EQ_TO_MERGE::EQ_TO_MERGE ()
     : RULE ("EQJOIN -> MERGE_JOIN", 2,
-	    new EXPR (new EQJOIN (0,0,0),
-			new EXPR (new LEAF_OP (0)),
-			new EXPR (new LEAF_OP (1))
+	    new EXPR (new EQJoinLogicalOperator (0,0,0),
+			new EXPR (new LeafOperator (0)),
+			new EXPR (new LeafOperator (1))
 			),
-	    new EXPR (new MERGE_JOIN (0,0,0),
-			new EXPR (new LEAF_OP (0)),
-			new EXPR (new LEAF_OP (1))
+	    new EXPR (new MergeJoinPhysicalOperator (0,0,0),
+			new EXPR (new LeafOperator (0)),
+			new EXPR (new LeafOperator (1))
 			)
 		)
 {
@@ -814,10 +814,10 @@ EQ_TO_MERGE::EQ_TO_MERGE ()
 } // EQ_TO_MERGE::EQ_TO_MERGE
 
 //##ModelId=3B0C086A0215
-int EQ_TO_MERGE::promise (OP* op_arg, int ContextID)
+int EQ_TO_MERGE::promise (Operator* op_arg, int ContextID)
 {
 	// if the merge-join attributes set is empty, don't fire this rule
-	int result = ( ((EQJOIN*)op_arg)->size == 0 ) ? 0 : MERGE_PROMISE ;
+	int result = ( ((EQJoinLogicalOperator*)op_arg)->size == 0 ) ? 0 : MERGE_PROMISE ;
 	
     return ( result );
 } // EQ_TO_MERGE::promise 
@@ -828,13 +828,13 @@ EXPR * EQ_TO_MERGE::next_substitute (EXPR * before,PHYS_PROP * ReqdProp)
 {
     EXPR * result;
 	
-	EQJOIN * Op = (EQJOIN *) before->GetOp();
+	EQJoinLogicalOperator * Op = (EQJoinLogicalOperator *) before->GetOp();
 	int size =  Op->size;
     int * lattrs = CopyArray ( Op->lattrs, size);
     int * rattrs = CopyArray ( Op->rattrs, size);
 	
     // create transformed expression
-    result = new EXPR (new MERGE_JOIN (lattrs, rattrs,size),
+    result = new EXPR (new MergeJoinPhysicalOperator (lattrs, rattrs,size),
 		new EXPR(*(before->GetInput(0))), 
 		new EXPR(*(before->GetInput(1)))
 		);
@@ -865,13 +865,13 @@ bool EQ_TO_MERGE::condition ( EXPR * before, M_EXPR *mexpr, int ContextID)
 //##ModelId=3B0C086A02B4
 EQ_TO_HASH::EQ_TO_HASH ()
     : RULE ("EQJOIN->HASH_JOIN", 2,
-	    new EXPR (new EQJOIN (0,0,0),
-			new EXPR (new LEAF_OP (0)),
-			new EXPR (new LEAF_OP (1))
+	    new EXPR (new EQJoinLogicalOperator (0,0,0),
+			new EXPR (new LeafOperator (0)),
+			new EXPR (new LeafOperator (1))
 			),
-	    new EXPR (new HASH_JOIN (0,0,0),
-			new EXPR (new LEAF_OP (0)),
-			new EXPR (new LEAF_OP (1))
+	    new EXPR (new HashJoinPhysicalOperator (0,0,0),
+			new EXPR (new LeafOperator (0)),
+			new EXPR (new LeafOperator (1))
 			)
 		)
 {
@@ -880,10 +880,10 @@ EQ_TO_HASH::EQ_TO_HASH ()
 } // EQ_TO_HASH::EQ_TO_HASH
 
 //##ModelId=3B0C086A02B5
-int EQ_TO_HASH::promise (OP* op_arg, int ContextID)
+int EQ_TO_HASH::promise (Operator* op_arg, int ContextID)
 {
 	// if the hash-join attributes set is empty, don't fire this rule
-	int result = ( ((EQJOIN*)op_arg)->size == 0 ) ? 0 : HASH_PROMISE ;
+	int result = ( ((EQJoinLogicalOperator*)op_arg)->size == 0 ) ? 0 : HASH_PROMISE ;
 	
     return ( result );
 } // EQ_TO_HASH::promise 
@@ -893,13 +893,13 @@ EXPR * EQ_TO_HASH::next_substitute (EXPR * before,PHYS_PROP * ReqdProp)
 {
     EXPR * result;
 	
-	EQJOIN * Op = (EQJOIN *) before->GetOp();
+	EQJoinLogicalOperator * Op = (EQJoinLogicalOperator *) before->GetOp();
 	int size =  Op->size;
     int * lattrs = CopyArray ( Op->lattrs, size);
     int * rattrs = CopyArray ( Op->rattrs, size);
 	
     // create transformed expression
-    result = new EXPR (new HASH_JOIN (lattrs, rattrs,size),
+    result = new EXPR (new HashJoinPhysicalOperator (lattrs, rattrs,size),
 		new EXPR(*(before->GetInput(0))), 
 		new EXPR(*(before->GetInput(1)))
 		);
@@ -914,13 +914,13 @@ EXPR * EQ_TO_HASH::next_substitute (EXPR * before,PHYS_PROP * ReqdProp)
 //##ModelId=3B0C086A03CE
 EQJOIN_COMMUTE::EQJOIN_COMMUTE ()
     : RULE ("EQJOIN_COMMUTE", 2,
-		new EXPR (new EQJOIN (0,0,0),
-					  new EXPR (new LEAF_OP (0)),
-					  new EXPR (new LEAF_OP (1))
+		new EXPR (new EQJoinLogicalOperator (0,0,0),
+					  new EXPR (new LeafOperator (0)),
+					  new EXPR (new LeafOperator (1))
 				  ),
-	    new EXPR (new EQJOIN (0,0,0),
-					  new EXPR (new LEAF_OP (1)),
-					  new EXPR (new LEAF_OP (0))
+	    new EXPR (new EQJoinLogicalOperator (0,0,0),
+					  new EXPR (new LeafOperator (1)),
+					  new EXPR (new LeafOperator (0))
 				  )
 			 )
 { 
@@ -939,13 +939,13 @@ EQJOIN_COMMUTE::EQJOIN_COMMUTE ()
 EXPR * EQJOIN_COMMUTE::next_substitute (EXPR * before,PHYS_PROP * ReqdProp)
 {
     // lattrs and rattrs
-	EQJOIN * Op = (EQJOIN *) before->GetOp();
+	EQJoinLogicalOperator * Op = (EQJoinLogicalOperator *) before->GetOp();
 	int size =  Op->size;
     int * lattrs = CopyArray ( Op->lattrs, size);
     int * rattrs = CopyArray ( Op->rattrs, size);
 	
     // create transformed expression 
-    EXPR *result = new EXPR (new EQJOIN ( rattrs, lattrs, size),	// reverse l and r
+    EXPR *result = new EXPR (new EQJoinLogicalOperator ( rattrs, lattrs, size),	// reverse l and r
 		new EXPR(*(before->GetInput(1))), 
 		new EXPR(*(before->GetInput(0)))
 		);
@@ -961,18 +961,18 @@ EXPR * EQJOIN_COMMUTE::next_substitute (EXPR * before,PHYS_PROP * ReqdProp)
 //##ModelId=3B0C086B00A3
 EQJOIN_LTOR::EQJOIN_LTOR ()
     : RULE ("EQJOIN_LTOR", 3,
-		new EXPR (new EQJOIN (0,0,0),
-				      new EXPR (new EQJOIN (0,0,0),
-								    new EXPR (new LEAF_OP (0)),	// A
-								    new EXPR (new LEAF_OP (1))	// B
+		new EXPR (new EQJoinLogicalOperator (0,0,0),
+				      new EXPR (new EQJoinLogicalOperator (0,0,0),
+								    new EXPR (new LeafOperator (0)),	// A
+								    new EXPR (new LeafOperator (1))	// B
 								),	
-					   new EXPR (new LEAF_OP (2))				// C
+					   new EXPR (new LeafOperator (2))				// C
 				   ),	// original pattern
-	    new EXPR (new EQJOIN (0,0,0),
-					  new EXPR (new LEAF_OP (0)),
-					  new EXPR (new EQJOIN (0,0,0),
-								    new EXPR (new LEAF_OP (1)),
-								    new EXPR (new LEAF_OP (2))
+	    new EXPR (new EQJoinLogicalOperator (0,0,0),
+					  new EXPR (new LeafOperator (0)),
+					  new EXPR (new EQJoinLogicalOperator (0,0,0),
+								    new EXPR (new LeafOperator (1)),
+								    new EXPR (new LeafOperator (2))
 								)
 				  )		// substitute
 			)
@@ -997,13 +997,13 @@ EXPR * EQJOIN_LTOR::next_substitute (EXPR * before,PHYS_PROP * ReqdProp)
      * EQJOIN (AxB)xC -> EQJOIN Ax(BxC)		original -> substitute patterns
      */
     // from upper (second) join		
-	EQJOIN * Op2 = (EQJOIN *) before->GetOp();
+	EQJoinLogicalOperator * Op2 = (EQJoinLogicalOperator *) before->GetOp();
 	int size2 = Op2->size;
     int * lattrs2 = Op2->lattrs ;		// equal attr's from left		
     int * rattrs2 = Op2->rattrs ;    
 	
     // from lower (first) join
-	EQJOIN * Op1 = (EQJOIN *) before->GetInput(0)->GetOp() ;
+	EQJoinLogicalOperator * Op1 = (EQJoinLogicalOperator *) before->GetInput(0)->GetOp() ;
 	int size1 = Op1->size;
     int * lattrs1 = Op1->lattrs ;		// equal attr's from left		
     int * rattrs1 = Op1->rattrs ;    
@@ -1030,7 +1030,7 @@ EXPR * EQJOIN_LTOR::next_substitute (EXPR * before,PHYS_PROP * ReqdProp)
 	
     //	B's schema determines new joining conditions.  Get it.
     EXPR * AB = before->GetInput(0);
-	LEAF_OP * B = (LEAF_OP *) ( AB->GetInput(1)->GetOp() );
+	LeafOperator * B = (LeafOperator *) ( AB->GetInput(1)->GetOp() );
     GRP_ID group_no = B->GetGroup();
     EXP_GROUP * group = Ssp->GetGroup(group_no);
     SCHEMA *Bs_schema = ((LOG_COLL_PROP *)(group->get_log_prop())) ->Schema;
@@ -1058,7 +1058,7 @@ EXPR * EQJOIN_LTOR::next_substitute (EXPR * before,PHYS_PROP * ReqdProp)
 	// Check that each join is legal
 	
     // Get C's schema
-	LEAF_OP * C = (LEAF_OP *)(before -> GetInput(1) -> GetOp());
+	LeafOperator * C = (LeafOperator *)(before -> GetInput(1) -> GetOp());
     group_no = C -> GetGroup();                
     group = Ssp->GetGroup(group_no);
     SCHEMA *Cs_schema = ((LOG_COLL_PROP *)group->get_log_prop()) ->Schema;
@@ -1071,7 +1071,7 @@ EXPR * EQJOIN_LTOR::next_substitute (EXPR * before,PHYS_PROP * ReqdProp)
     }
 	
 	//  Get A's schema
-    LEAF_OP * A = (LEAF_OP *)( AB -> GetInput(0) -> GetOp() );
+    LeafOperator * A = (LeafOperator *)( AB -> GetInput(0) -> GetOp() );
     group_no = A -> GetGroup() ;
     group = Ssp->GetGroup(group_no);;
     SCHEMA *As_schema = ((LOG_COLL_PROP *)group->get_log_prop()) -> Schema;
@@ -1084,9 +1084,9 @@ EXPR * EQJOIN_LTOR::next_substitute (EXPR * before,PHYS_PROP * ReqdProp)
 #endif
 	
     // create transformed expression
-    EXPR * result = new EXPR (new EQJOIN (nlattrs2,nrattrs2,nsize2),
+    EXPR * result = new EXPR (new EQJoinLogicalOperator (nlattrs2,nrattrs2,nsize2),
 						   new EXPR(*(before->GetInput(0)->GetInput(0))),
-						   new EXPR (new EQJOIN (nlattrs1, nrattrs1, nsize1),
+						   new EXPR (new EQJoinLogicalOperator (nlattrs1, nrattrs1, nsize1),
 										 new EXPR(*(before->GetInput(0)->GetInput(1))),
 										 new EXPR(*(before->GetInput(1))) )
 						);
@@ -1191,19 +1191,19 @@ EXPR * EQJOIN_LTOR::next_substitute (EXPR * before,PHYS_PROP * ReqdProp)
 //##ModelId=3B0C086B016C
   EQJOIN_RTOL::EQJOIN_RTOL ()
     : RULE ("EQJOIN_RTOL", 3,
-            new EXPR (new EQJOIN (0,0,0),
-						  new EXPR (new LEAF_OP (0)),		//A
-						  new EXPR (new EQJOIN (0,0,0),
-										new EXPR (new LEAF_OP (1)),	//B
-										new EXPR (new LEAF_OP (2))  //C
+            new EXPR (new EQJoinLogicalOperator (0,0,0),
+						  new EXPR (new LeafOperator (0)),		//A
+						  new EXPR (new EQJoinLogicalOperator (0,0,0),
+										new EXPR (new LeafOperator (1)),	//B
+										new EXPR (new LeafOperator (2))  //C
 									)
 					  ),	// original pattern
-            new EXPR (new EQJOIN (0,0,0),
-						  new EXPR (new EQJOIN (0,0,0),
-										new EXPR (new LEAF_OP (0)), //A
-										new EXPR (new LEAF_OP (1))  //B
+            new EXPR (new EQJoinLogicalOperator (0,0,0),
+						  new EXPR (new EQJoinLogicalOperator (0,0,0),
+										new EXPR (new LeafOperator (0)), //A
+										new EXPR (new LeafOperator (1))  //B
 									),
-						   new EXPR (new LEAF_OP (2))	//C
+						   new EXPR (new LeafOperator (2))	//C
 					  )	// substitute
 			   )            
   {
@@ -1225,13 +1225,13 @@ EXPR * EQJOIN_LTOR::next_substitute (EXPR * before,PHYS_PROP * ReqdProp)
    * EQJOIN Ax(BxC) -> EQJOIN (AxB)xC
    */
 	  // from upper (second) join
-	  EQJOIN * Op2 = (EQJOIN *) before->GetOp();
+	  EQJoinLogicalOperator * Op2 = (EQJoinLogicalOperator *) before->GetOp();
 	  int size2 = Op2->size;
 	  int * lattrs2 = Op2->lattrs ;		// equal attr's from left		
 	  int * rattrs2 = Op2->rattrs ;    
 	  
 	  // from lower (first) join
-	  EQJOIN * Op1 = (EQJOIN *) before->GetInput(1)->GetOp() ;
+	  EQJoinLogicalOperator * Op1 = (EQJoinLogicalOperator *) before->GetInput(1)->GetOp() ;
 	  int size1 = Op1->size;
 	  int * lattrs1 = Op1->lattrs ;		// equal attr's from left		
 	  int * rattrs1 = Op1->rattrs ;    
@@ -1258,7 +1258,7 @@ EXPR * EQJOIN_LTOR::next_substitute (EXPR * before,PHYS_PROP * ReqdProp)
 	  
 	  // Get schema for B 
 	  EXPR * BC = before->GetInput(1);
-	  LEAF_OP * B = (LEAF_OP *) (BC->GetInput(0) -> GetOp());
+	  LeafOperator * B = (LeafOperator *) (BC->GetInput(0) -> GetOp());
 	  GRP_ID group_no = B->GetGroup();
 	  EXP_GROUP * group = Ssp->GetGroup(group_no);
 	  LOG_PROP * LogProp = group->get_log_prop();	
@@ -1293,7 +1293,7 @@ EXPR * EQJOIN_LTOR::next_substitute (EXPR * before,PHYS_PROP * ReqdProp)
 	  }
 	  
 	  // Get C's schema
-	  LEAF_OP * C = (LEAF_OP *) ( BC->GetInput(1)->GetOp() );
+	  LeafOperator * C = (LeafOperator *) ( BC->GetInput(1)->GetOp() );
 	  group_no = C->GetGroup();
 	  group = Ssp->GetGroup(group_no);
 	  LogProp = group->get_log_prop();
@@ -1307,8 +1307,8 @@ EXPR * EQJOIN_LTOR::next_substitute (EXPR * before,PHYS_PROP * ReqdProp)
 #endif
 	  
 	  // create transformed expression
-	  EXPR * result = new EXPR (new EQJOIN (nlattrs2, nrattrs2,nsize2),  // args reversed
-		  new EXPR (new EQJOIN (nlattrs1, nrattrs1,nsize1),
+	  EXPR * result = new EXPR (new EQJoinLogicalOperator (nlattrs2, nrattrs2,nsize2),  // args reversed
+		  new EXPR (new EQJoinLogicalOperator (nlattrs1, nrattrs1,nsize1),
 										new EXPR(*(before -> GetInput(0))),
 										new EXPR(*(before -> GetInput(1) -> GetInput(0)))
 										),
@@ -1411,21 +1411,21 @@ EXPR * EQJOIN_LTOR::next_substitute (EXPR * before,PHYS_PROP * ReqdProp)
 //##ModelId=3B0C086B023F
 	EXCHANGE::EXCHANGE ()
     : RULE ("EXCHANGE", 4,
-            new EXPR (new EQJOIN (0,0,0),
-                new EXPR (new EQJOIN (0,0,0),
-                    new EXPR (new LEAF_OP (0)),		//A
-                    new EXPR (new LEAF_OP (1))),	//B
-                new EXPR (new EQJOIN (0,0,0),
-                    new EXPR (new LEAF_OP (2)),		//C
-                    new EXPR (new LEAF_OP (3)))),	//D
+            new EXPR (new EQJoinLogicalOperator (0,0,0),
+                new EXPR (new EQJoinLogicalOperator (0,0,0),
+                    new EXPR (new LeafOperator (0)),		//A
+                    new EXPR (new LeafOperator (1))),	//B
+                new EXPR (new EQJoinLogicalOperator (0,0,0),
+                    new EXPR (new LeafOperator (2)),		//C
+                    new EXPR (new LeafOperator (3)))),	//D
 
-            new EXPR (new EQJOIN (0,0,0),
-                new EXPR (new EQJOIN (0,0,0),
-                    new EXPR (new LEAF_OP (0)),		//A
-                    new EXPR (new LEAF_OP (2))),	//C
-                new EXPR (new EQJOIN (0,0,0),
-                    new EXPR (new LEAF_OP (1)),		//B
-                    new EXPR (new LEAF_OP (3)))))	//D
+            new EXPR (new EQJoinLogicalOperator (0,0,0),
+                new EXPR (new EQJoinLogicalOperator (0,0,0),
+                    new EXPR (new LeafOperator (0)),		//A
+                    new EXPR (new LeafOperator (2))),	//C
+                new EXPR (new EQJoinLogicalOperator (0,0,0),
+                    new EXPR (new LeafOperator (1)),		//B
+                    new EXPR (new LeafOperator (3)))))	//D
 	{
 		// set rule mask and index
 		set_index ( R_EXCHANGE);
@@ -1446,19 +1446,19 @@ EXPR * EQJOIN_LTOR::next_substitute (EXPR * before,PHYS_PROP * ReqdProp)
 	*/
 		
 		// from join 1
-		EQJOIN * Op1 = (EQJOIN *) before->GetOp();
+		EQJoinLogicalOperator * Op1 = (EQJoinLogicalOperator *) before->GetOp();
 		int size1 = Op1->size;
 		int * lattrs1 = Op1->lattrs ;		
 		int * rattrs1 = Op1->rattrs ;    
 		
 		// from join 2
-		EQJOIN * Op2 = (EQJOIN *) before->GetInput(0)->GetOp();
+		EQJoinLogicalOperator * Op2 = (EQJoinLogicalOperator *) before->GetInput(0)->GetOp();
 		int size2 = Op2->size;
 		int * lattrs2 = Op2->lattrs ;		
 		int * rattrs2 = Op2->rattrs ;    
 		
 		// from join 3
-		EQJOIN * Op3 = (EQJOIN *) before->GetInput(1)->GetOp();
+		EQJoinLogicalOperator * Op3 = (EQJoinLogicalOperator *) before->GetInput(1)->GetOp();
 		int size3 = Op3->size;
 		int * lattrs3 = Op3->lattrs ;		
 		int * rattrs3 = Op3->rattrs ;    
@@ -1509,7 +1509,7 @@ EXPR * EQJOIN_LTOR::next_substitute (EXPR * before,PHYS_PROP * ReqdProp)
 		
 		// Get schema for A
 		EXPR * AB = before->GetInput(0);
-		LEAF_OP * AA = (LEAF_OP *) AB->GetInput(0)->GetOp() ;
+		LeafOperator * AA = (LeafOperator *) AB->GetInput(0)->GetOp() ;
 		GRP_ID  group_no = AA->GetGroup();
 		EXP_GROUP * group = Ssp->GetGroup(group_no);
 		LOG_PROP * log_prop = group->get_log_prop();	
@@ -1517,7 +1517,7 @@ EXPR * EQJOIN_LTOR::next_substitute (EXPR * before,PHYS_PROP * ReqdProp)
 		
 		// Get schema for C
 		EXPR * CD = before->GetInput(1);
-		LEAF_OP * CC = (LEAF_OP *) CD->GetInput(0)->GetOp() ;
+		LeafOperator * CC = (LeafOperator *) CD->GetInput(0)->GetOp() ;
 		group_no = CC->GetGroup();
 		group = Ssp->GetGroup(group_no);
 		log_prop = group->get_log_prop();	
@@ -1570,12 +1570,12 @@ EXPR * EQJOIN_LTOR::next_substitute (EXPR * before,PHYS_PROP * ReqdProp)
 		
 		// create transformed expression
 		EXPR * result = 
-			new EXPR(new EQJOIN (nlattrs1, nrattrs1,nsize1),	
-				new EXPR (new EQJOIN (nlattrs2, nrattrs2,nsize2),
+			new EXPR(new EQJoinLogicalOperator (nlattrs1, nrattrs1,nsize1),	
+				new EXPR (new EQJoinLogicalOperator (nlattrs2, nrattrs2,nsize2),
 						new EXPR ( *(before->GetInput(0)->GetInput(0)) ), //A
 						new EXPR ( *(before->GetInput(1)->GetInput(0)) )  //C
 					),        
-					new EXPR (new EQJOIN (nlattrs3, nrattrs3,nsize3),
+					new EXPR (new EQJoinLogicalOperator (nlattrs3, nrattrs3,nsize3),
 						new EXPR ( *(before->GetInput(0)->GetInput(1)) ), //B
             			new EXPR ( *(before->GetInput(1)->GetInput(1)) )  //D
 						)
@@ -1735,13 +1735,13 @@ EXPR * EQJOIN_LTOR::next_substitute (EXPR * before,PHYS_PROP * ReqdProp)
 //##ModelId=3B0C086B0361
   SELECT_TO_FILTER::SELECT_TO_FILTER ()
     : RULE ("SELECT -> FILTER", 2,
-	    new EXPR (new SELECT,
-			new EXPR (new LEAF_OP (0)),				// table
-			new EXPR (new LEAF_OP (1))				// predicate
+	    new EXPR (new SelectLogicalOperator,
+			new EXPR (new LeafOperator (0)),				// table
+			new EXPR (new LeafOperator (1))				// predicate
 			),
-	    new EXPR (new FILTER,
-			new EXPR (new LEAF_OP (0)),
-			new EXPR (new LEAF_OP (1))
+	    new EXPR (new FilterPhysicalOperator,
+			new EXPR (new LeafOperator (0)),
+			new EXPR (new LeafOperator (1))
 			)
 		)
   {
@@ -1755,7 +1755,7 @@ EXPR * EQJOIN_LTOR::next_substitute (EXPR * before,PHYS_PROP * ReqdProp)
 	  EXPR * result;
 	  
 	  // create transformed expression
-	  result = new EXPR (new FILTER,
+	  result = new EXPR (new FilterPhysicalOperator,
 		  new EXPR (*(before->GetInput(0))),
 		  new EXPR (*(before->GetInput(1)))
 		  );
@@ -1771,11 +1771,11 @@ EXPR * EQJOIN_LTOR::next_substitute (EXPR * before,PHYS_PROP * ReqdProp)
 //##ModelId=3B0C086B02DE
   P_TO_PP::P_TO_PP ()
     : RULE ("PROJECT -> P_PROJECT", 1,
-	    new EXPR (new PROJECT (0,0),
-			new EXPR (new LEAF_OP (0))
+	    new EXPR (new ProjectLogicalOperator (0,0),
+			new EXPR (new LeafOperator (0))
 			),
-	    new EXPR (new P_PROJECT (0,0),
-			new EXPR (new LEAF_OP (0))
+	    new EXPR (new ProjectPhysicalOperator (0,0),
+			new EXPR (new LeafOperator (0))
 			)
 		)
   {
@@ -1788,14 +1788,14 @@ EXPR * EQJOIN_LTOR::next_substitute (EXPR * before,PHYS_PROP * ReqdProp)
   {
 	  EXPR * result;
 	  
-	  PROJECT * Op = (PROJECT *) before->GetOp();
+	  ProjectLogicalOperator * Op = (ProjectLogicalOperator *) before->GetOp();
 	  int size =  Op->size;
 	  int * attrs = CopyArray ( Op->attrs, size);
 	  
 #ifdef _DEBUG
 	  
 	  // Get input's schema
-	  LEAF_OP * A = (LEAF_OP *) ( before->GetInput(0)->GetOp() );
+	  LeafOperator * A = (LeafOperator *) ( before->GetInput(0)->GetOp() );
 	  GRP_ID group_no = A->GetGroup();
 	  EXP_GROUP* group = Ssp->GetGroup(group_no);
 	  LOG_PROP * LogProp = group->get_log_prop();
@@ -1809,7 +1809,7 @@ EXPR * EQJOIN_LTOR::next_substitute (EXPR * before,PHYS_PROP * ReqdProp)
 #endif
 	  
 	  // create transformed expression
-	  result = new EXPR (new P_PROJECT (attrs, size),
+	  result = new EXPR (new ProjectPhysicalOperator (attrs, size),
 		  new EXPR (*(before->GetInput(0)))
 		  );
 	  
@@ -1824,9 +1824,9 @@ EXPR * EQJOIN_LTOR::next_substitute (EXPR * before,PHYS_PROP * ReqdProp)
 //##ModelId=3B0C086C0037
   SORT_RULE::SORT_RULE ()
     : RULE ("SORT enforcer", 1,
-	    new EXPR (new LEAF_OP (0)),
-	    new EXPR (new QSORT(),   //bogus should this be oby?
-			new EXPR (new LEAF_OP (0))
+	    new EXPR (new LeafOperator (0)),
+	    new EXPR (new QsortPhysicalOperator(),   //bogus should this be oby?
+			new EXPR (new LeafOperator (0))
 			)
 		)
   {
@@ -1838,14 +1838,14 @@ EXPR * EQJOIN_LTOR::next_substitute (EXPR * before,PHYS_PROP * ReqdProp)
   EXPR * SORT_RULE::next_substitute (EXPR * before, PHYS_PROP * ReqdProp)
   {
 	  // create transformed expression
-	  EXPR * result = new EXPR (new QSORT(),
+	  EXPR * result = new EXPR (new QsortPhysicalOperator(),
 		  new EXPR(*before)
 		  );
 	  return ( result );
   }
   
 //##ModelId=3B0C086C0041
-  int SORT_RULE::promise (OP* op_arg, int ContextID)
+  int SORT_RULE::promise (Operator* op_arg, int ContextID)
   {
 	  CONT * Cont = CONT::vc[ContextID];
 	  PHYS_PROP * ReqdProp =  Cont -> GetPhysProp();	//What prop is required of
@@ -1863,11 +1863,11 @@ EXPR * EQJOIN_LTOR::next_substitute (EXPR * before,PHYS_PROP * ReqdProp)
 //##ModelId=3B0C086C00EB
   RM_TO_HASH_DUPLICATES::RM_TO_HASH_DUPLICATES ()
     : RULE ("RM_DUPLICATES  -> HASH_DUPLICATES", 1,
-	    new EXPR (new RM_DUPLICATES(),
-			new EXPR (new LEAF_OP (0))				// input table
+	    new EXPR (new RMDuplicatesLogicalOperator(),
+			new EXPR (new LeafOperator (0))				// input table
 			),
-	    new EXPR (new HASH_DUPLICATES(),
-			new EXPR (new LEAF_OP (0))
+	    new EXPR (new HashDuplicatesPhysicalOperator(),
+			new EXPR (new LeafOperator (0))
 			)
 		)
   {
@@ -1881,7 +1881,7 @@ EXPR * EQJOIN_LTOR::next_substitute (EXPR * before,PHYS_PROP * ReqdProp)
 	  EXPR * result;
 	  
 	  // create transformed expression
-	  result = new EXPR (new HASH_DUPLICATES(),
+	  result = new EXPR (new HashDuplicatesPhysicalOperator(),
 		  new EXPR (*(before->GetInput(0)))
 		  );
 	  
@@ -1897,11 +1897,11 @@ EXPR * EQJOIN_LTOR::next_substitute (EXPR * before,PHYS_PROP * ReqdProp)
 //##ModelId=3B0C086C018C
   AL_TO_HGL::AL_TO_HGL(AGG_OP_ARRAY *list1, AGG_OP_ARRAY *list2)
 	: RULE("AGG_LIST  -> HGROUP_LIST", 1,
-			new EXPR (new AGG_LIST(0,0,list1),
-				new EXPR (new LEAF_OP (0))				// input table
+			new EXPR (new AggregateListLogicalOperator(0,0,list1),
+				new EXPR (new LeafOperator (0))				// input table
 				),
-			new EXPR (new HGROUP_LIST(0,0,list2),
-				new EXPR (new LEAF_OP (0))
+			new EXPR (new HashAggListPhysicalOperator(0,0,list2),
+				new EXPR (new LeafOperator (0))
 				)
 			)
   {
@@ -1914,7 +1914,7 @@ EXPR * EQJOIN_LTOR::next_substitute (EXPR * before,PHYS_PROP * ReqdProp)
   {
 	  EXPR * result;
 	  
-	  AGG_LIST * Op = (AGG_LIST *) before->GetOp();
+	  AggregateListLogicalOperator * Op = (AggregateListLogicalOperator *) before->GetOp();
 	  int size =  Op->GbySize;
 	  int * attrs = CopyArray ( Op->GbyAtts, size);
 	  
@@ -1927,7 +1927,7 @@ EXPR * EQJOIN_LTOR::next_substitute (EXPR * before,PHYS_PROP * ReqdProp)
 	  }
 	  
 	  // create transformed expression
-	  result = new EXPR (new HGROUP_LIST(attrs, size, agg_ops),
+	  result = new EXPR (new HashAggListPhysicalOperator(attrs, size, agg_ops),
 		  new EXPR (*(before->GetInput(0)))
 		  );
 	  
@@ -1942,11 +1942,11 @@ EXPR * EQJOIN_LTOR::next_substitute (EXPR * before,PHYS_PROP * ReqdProp)
 //##ModelId=3B0C086C0235
   FO_TO_PFO::FO_TO_PFO()
     : RULE ("FUNC_OP  -> P_FUNC_OP", 1,
-	    new EXPR (new FUNC_OP("",0,0),
-			new EXPR (new LEAF_OP (0))				// input table
+	    new EXPR (new FunctionLogicalOperator("",0,0),
+			new EXPR (new LeafOperator (0))				// input table
 			),
-	    new EXPR (new P_FUNC_OP("",0,0),
-			new EXPR (new LEAF_OP (0))
+	    new EXPR (new FunctionPhysicalOperator("",0,0),
+			new EXPR (new LeafOperator (0))
 			)
 		)
   {
@@ -1959,12 +1959,12 @@ EXPR * EQJOIN_LTOR::next_substitute (EXPR * before,PHYS_PROP * ReqdProp)
   {
 	  EXPR * result;
 	  
-	  FUNC_OP * Op = (FUNC_OP *) before->GetOp();
+	  FunctionLogicalOperator * Op = (FunctionLogicalOperator *) before->GetOp();
 	  int size =  Op->AttsSize;
 	  int * attrs = CopyArray ( Op->Atts, size);
 	  
 	  // create transformed expression
-	  result = new EXPR (new P_FUNC_OP(Op->RangeVar, attrs, size),
+	  result = new EXPR (new FunctionPhysicalOperator(Op->RangeVar, attrs, size),
 		  new EXPR (*(before->GetInput(0)))
 		  );
 	  
@@ -1979,16 +1979,16 @@ EXPR * EQJOIN_LTOR::next_substitute (EXPR * before,PHYS_PROP * ReqdProp)
 //##ModelId=3B0C086C0308
   AGG_THRU_EQJOIN::AGG_THRU_EQJOIN (AGG_OP_ARRAY *list1, AGG_OP_ARRAY *list2)
 	:RULE ("AGGREGATE EQJOIN -> JOIN AGGREGATE", 2,
-			new EXPR (new AGG_LIST(0,0,list1),
-				new EXPR (new EQJOIN (0,0,0),
-					new EXPR (new LEAF_OP (0)),
-					new EXPR (new LEAF_OP (1))
+			new EXPR (new AggregateListLogicalOperator(0,0,list1),
+				new EXPR (new EQJoinLogicalOperator (0,0,0),
+					new EXPR (new LeafOperator (0)),
+					new EXPR (new LeafOperator (1))
 					)
 				),
-			new EXPR (new EQJOIN(0,0,0),
-				new EXPR (new LEAF_OP(0)),
-				new EXPR (new AGG_LIST(0,0,list2),
-					new EXPR (new LEAF_OP (1))
+			new EXPR (new EQJoinLogicalOperator(0,0,0),
+				new EXPR (new LeafOperator(0)),
+				new EXPR (new AggregateListLogicalOperator(0,0,list2),
+					new EXPR (new LeafOperator (1))
 					)
 				)
 			)
@@ -2003,7 +2003,7 @@ EXPR * EQJOIN_LTOR::next_substitute (EXPR * before,PHYS_PROP * ReqdProp)
 	  EXPR * result;
 	  int i;
 	  // get GbyAtts and AggOps
-	  AGG_LIST * agg_op = (AGG_LIST *) before->GetOp();
+	  AggregateListLogicalOperator * agg_op = (AggregateListLogicalOperator *) before->GetOp();
 	  int * gby_atts = CopyArray(agg_op->GbyAtts, agg_op->GbySize);
 	  AGG_OP_ARRAY *	agg_ops = new AGG_OP_ARRAY;
 	  agg_ops->SetSize(agg_op->AggOps->GetSize());
@@ -2013,12 +2013,12 @@ EXPR * EQJOIN_LTOR::next_substitute (EXPR * before,PHYS_PROP * ReqdProp)
 	  }
 	  
 	  //EQJOIN is the only input to AGG_LIST
-	  EQJOIN * Op = (EQJOIN *) before->GetInput(0)->GetOp();
+	  EQJoinLogicalOperator * Op = (EQJoinLogicalOperator *) before->GetInput(0)->GetOp();
 	  int size =  Op->size;
 	  int * lattrs = CopyArray ( Op->lattrs, size);
 	  int * rattrs = CopyArray ( Op->rattrs, size);
 	  //get the schema of the right input
-	  LEAF_OP * r_op = (LEAF_OP *) before->GetInput(0)->GetInput(1)->GetOp();
+	  LeafOperator * r_op = (LeafOperator *) before->GetInput(0)->GetInput(1)->GetOp();
 	  GRP_ID r_gid = r_op->GetGroup();
 	  EXP_GROUP * r_group = Ssp->GetGroup(r_gid);
 	  LOG_COLL_PROP * r_prop = (LOG_COLL_PROP *) r_group->get_log_prop();
@@ -2045,9 +2045,9 @@ EXPR * EQJOIN_LTOR::next_substitute (EXPR * before,PHYS_PROP * ReqdProp)
 	  
 	  delete [] gby_atts;
 	  // create transformed expression
-	  result = new EXPR (new EQJOIN (lattrs, rattrs, size),
+	  result = new EXPR (new EQJoinLogicalOperator (lattrs, rattrs, size),
 		  new EXPR (*(before->GetInput(0)->GetInput(0))),
-		  new EXPR ( new AGG_LIST (new_gby_atts, new_gby_size, agg_ops),
+		  new EXPR ( new AggregateListLogicalOperator (new_gby_atts, new_gby_size, agg_ops),
 		  new EXPR (*(before->GetInput(0)->GetInput(1))) )
 		  );
 	  
@@ -2065,23 +2065,23 @@ EXPR * EQJOIN_LTOR::next_substitute (EXPR * before,PHYS_PROP * ReqdProp)
   bool AGG_THRU_EQJOIN::condition ( EXPR * before, M_EXPR *mexpr, int ContextID)
   {
 	  // get attributes used in aggregates, and groupby attributes
-	  AGG_LIST * agg_op = (AGG_LIST *) before->GetOp();
+	  AggregateListLogicalOperator * agg_op = (AggregateListLogicalOperator *) before->GetOp();
 	  int * agg_atts = agg_op->FlattenedAtts;
 	  int * gby_atts = agg_op->GbyAtts;
 	  
 	  //EQJOIN is the only input to AGG_LIST
-	  EQJOIN * Op = (EQJOIN *) before->GetInput(0)->GetOp();
+	  EQJoinLogicalOperator * Op = (EQJoinLogicalOperator *) before->GetInput(0)->GetOp();
 	  int size =  Op->size;
 	  int * lattrs = Op->lattrs;
 	  int * rattrs = Op->rattrs;
 	  //get the schema of the right input
-	  LEAF_OP * r_op = (LEAF_OP *) before->GetInput(0)->GetInput(1)->GetOp();
+	  LeafOperator * r_op = (LeafOperator *) before->GetInput(0)->GetInput(1)->GetOp();
 	  GRP_ID r_gid = r_op->GetGroup();
 	  EXP_GROUP * r_group = Ssp->GetGroup(r_gid);
 	  LOG_COLL_PROP * r_prop = (LOG_COLL_PROP *) r_group->get_log_prop();
 	  SCHEMA * right_schema = r_prop->Schema;
 	  //get candidatekey of the left input
-	  LEAF_OP * l_op = (LEAF_OP *) before->GetInput(0)->GetInput(0)->GetOp();
+	  LeafOperator * l_op = (LeafOperator *) before->GetInput(0)->GetInput(0)->GetOp();
 	  GRP_ID l_gid = l_op->GetGroup();
 	  EXP_GROUP * l_group = Ssp->GetGroup(l_gid);
 	  LOG_COLL_PROP * l_prop = (LOG_COLL_PROP *) l_group->get_log_prop();
@@ -2126,16 +2126,16 @@ EXPR * EQJOIN_LTOR::next_substitute (EXPR * before,PHYS_PROP * ReqdProp)
 //##ModelId=3B0C086D0010
   EQ_TO_BIT::EQ_TO_BIT ()
     : RULE ("EQJOIN -> BIT_JOIN", 2,
-        new EXPR (new EQJOIN (0,0,0),
-			new EXPR (new LEAF_OP (0)),
-		    new EXPR (new SELECT,
-				new EXPR (new GET (0)),					// table
-				new EXPR (new LEAF_OP (1))				// predicate
+        new EXPR (new EQJoinLogicalOperator (0,0,0),
+			new EXPR (new LeafOperator (0)),
+		    new EXPR (new SelectLogicalOperator,
+				new EXPR (new GetLogicalOperator (0)),					// table
+				new EXPR (new LeafOperator (1))				// predicate
 			)
 		),
-	    new EXPR (new BIT_JOIN(0,0,0,0),
-			new EXPR (new LEAF_OP (0)),
-			new EXPR (new LEAF_OP (1))
+	    new EXPR (new BitJoinPhysicalOperator(0,0,0,0),
+			new EXPR (new LeafOperator (0)),
+			new EXPR (new LeafOperator (1))
 		)
 	)
   {
@@ -2149,15 +2149,15 @@ EXPR * EQJOIN_LTOR::next_substitute (EXPR * before,PHYS_PROP * ReqdProp)
 	  EXPR * result;
 	  
 	  //EQJOIN is the only input to PROJECT
-	  EQJOIN * EqOp = (EQJOIN *) before->GetOp();
+	  EQJoinLogicalOperator * EqOp = (EQJoinLogicalOperator *) before->GetOp();
 	  int size = EqOp->size;
 	  int * lattrs = CopyArray ( EqOp->lattrs, size);
 	  int * rattrs = CopyArray ( EqOp->rattrs, size);
 	  
 	  //Get is the left input to SELECT
-	  GET * GetOp = (GET *) before->GetInput(1)->GetInput(0)->GetOp();
+	  GetLogicalOperator * GetOp = (GetLogicalOperator *) before->GetInput(1)->GetInput(0)->GetOp();
 	  
-	  result = new EXPR (new BIT_JOIN (lattrs, rattrs, size, GetOp->GetCollection()),
+	  result = new EXPR (new BitJoinPhysicalOperator (lattrs, rattrs, size, GetOp->GetCollection()),
 		  new EXPR (*(before->GetInput(0))),
 		  new EXPR (*(before->GetInput(1)->GetInput(1)))
 		  );
@@ -2177,21 +2177,21 @@ EXPR * EQJOIN_LTOR::next_substitute (EXPR * before,PHYS_PROP * ReqdProp)
 //##ModelId=3B0C086D0024
   bool EQ_TO_BIT::condition ( EXPR * before, M_EXPR *mexpr, int ContextID)
   {
-	  EQJOIN * EqOp = (EQJOIN *) before->GetOp();
+	  EQJoinLogicalOperator * EqOp = (EQJoinLogicalOperator *) before->GetOp();
 	  int size =  EqOp->size;
 	  int * lattrs = EqOp->lattrs;
 	  int * rattrs = EqOp->rattrs;
 	  
 	  //get left input to eqjoin
 	  // Get schema for LEAF(0)
-	  LEAF_OP * LEAF0 = (LEAF_OP *) (before->GetInput(0)->GetOp());
+	  LeafOperator * LEAF0 = (LeafOperator *) (before->GetInput(0)->GetOp());
 	  GRP_ID group_no = LEAF0->GetGroup();
 	  EXP_GROUP * group = Ssp->GetGroup(group_no);
 	  LOG_PROP * LogProp = group->get_log_prop();	
 	  KEYS_SET * l_cand_key = ((LOG_COLL_PROP *)LogProp) ->CandidateKey;
 	  
 	  //Get is the left input to SELECT
-	  GET * GetOp = (GET *) before->GetInput(1)->GetInput(0)->GetOp();
+	  GetLogicalOperator * GetOp = (GetLogicalOperator *) before->GetInput(1)->GetInput(0)->GetOp();
 	  //get the candidate_keys and bit index
 	  int CollId = GetOp->GetCollection();
 	  // get candidate keys on 'collection'
@@ -2200,7 +2200,7 @@ EXPR * EQJOIN_LTOR::next_substitute (EXPR * before,PHYS_PROP * ReqdProp)
 	  INT_ARRAY * BitIndices = Cat->GetBitIndNames(CollId);
 	  
 	  //Get is the predicate of SELECT
-	  LEAF_OP * PredOp = (LEAF_OP *) before->GetInput(1)->GetInput(1)->GetOp();
+	  LeafOperator * PredOp = (LeafOperator *) before->GetInput(1)->GetInput(1)->GetOp();
 	  GRP_ID Pred_GID = PredOp->GetGroup();
 	  EXP_GROUP * leaf_group = Ssp->GetGroup(Pred_GID);
 	  LOG_PROP * leaf_prop = leaf_group->get_log_prop();
@@ -2249,12 +2249,12 @@ EXPR * EQJOIN_LTOR::next_substitute (EXPR * before,PHYS_PROP * ReqdProp)
 //##ModelId=3B0C086D00F6
   SELECT_TO_INDEXED_FILTER::SELECT_TO_INDEXED_FILTER ()
 	  : RULE ("SELECT -> INDEXED_FILTER", 1,
-		    new EXPR (new SELECT,
-			new EXPR (new GET (0)),				// table
-			new EXPR (new LEAF_OP (0))			// predicate
+		    new EXPR (new SelectLogicalOperator,
+			new EXPR (new GetLogicalOperator (0)),				// table
+			new EXPR (new LeafOperator (0))			// predicate
 			),
-			new EXPR (new INDEXED_FILTER(0),
-			new EXPR (new LEAF_OP (0))
+			new EXPR (new IndexedFilterPhysicalOperator(0),
+			new EXPR (new LeafOperator (0))
 			)
 			)
   {
@@ -2268,7 +2268,7 @@ EXPR * EQJOIN_LTOR::next_substitute (EXPR * before,PHYS_PROP * ReqdProp)
 	  EXPR * result;
 	  
 	  // create transformed expression
-	  result = new EXPR (new INDEXED_FILTER( ((GET *)before->GetInput(0)->GetOp())->GetCollection() ),
+	  result = new EXPR (new IndexedFilterPhysicalOperator( ((GetLogicalOperator *)before->GetInput(0)->GetOp())->GetCollection() ),
 		  new EXPR (*(before->GetInput(1)))
 		  );
 	  return result;
@@ -2281,11 +2281,11 @@ EXPR * EQJOIN_LTOR::next_substitute (EXPR * before,PHYS_PROP * ReqdProp)
   bool SELECT_TO_INDEXED_FILTER::condition ( EXPR * before, M_EXPR *mexpr, int ContextID)
   {
 	  //get the index list of the GET collection
-	  int CollId = ((GET *)before->GetInput(0)->GetOp())->GetCollection();
+	  int CollId = ((GetLogicalOperator *)before->GetInput(0)->GetOp())->GetCollection();
 	  INT_ARRAY * Indices = Cat->GetIndNames(CollId);
 	  
 	  //get the predicate free variables
-	  LEAF_OP * Pred = (LEAF_OP *) (before->GetInput(1)->GetOp());
+	  LeafOperator * Pred = (LeafOperator *) (before->GetInput(1)->GetOp());
 	  GRP_ID GrpNo = Pred->GetGroup();
 	  EXP_GROUP * PredGrp = Ssp->GetGroup(GrpNo);
 	  LOG_PROP * log_prop = PredGrp->get_log_prop();
@@ -2310,17 +2310,17 @@ EXPR * EQJOIN_LTOR::next_substitute (EXPR * before,PHYS_PROP * ReqdProp)
 //##ModelId=3B0C086D01B5
   PROJECT_THRU_SELECT::PROJECT_THRU_SELECT ()
     : RULE ("PROJECT_THRU_SELECT", 2,
-		    new EXPR (new PROJECT(0,0),
-				new EXPR (new SELECT,				// table
-					new EXPR (new LEAF_OP (0)),
-					new EXPR (new LEAF_OP (1))		// predicate
+		    new EXPR (new ProjectLogicalOperator(0,0),
+				new EXPR (new SelectLogicalOperator,				// table
+					new EXPR (new LeafOperator (0)),
+					new EXPR (new LeafOperator (1))		// predicate
 				)
 			),
-	    new EXPR (new PROJECT(0,0),
-			new EXPR (new SELECT,
-				new EXPR (new PROJECT(0,0),
-					new EXPR (new LEAF_OP (0))),
-				new EXPR (new LEAF_OP (1))
+	    new EXPR (new ProjectLogicalOperator(0,0),
+			new EXPR (new SelectLogicalOperator,
+				new EXPR (new ProjectLogicalOperator(0,0),
+					new EXPR (new LeafOperator (0))),
+				new EXPR (new LeafOperator (1))
 			)
 		)
 	)
@@ -2339,11 +2339,11 @@ EXPR * EQJOIN_LTOR::next_substitute (EXPR * before,PHYS_PROP * ReqdProp)
 	  int * pattrs;
 	  
 	  // Get the projection attributes
-	  top_pattrs = ((PROJECT *)before->GetOp())->attrs;
-	  top_size = ((PROJECT *)before->GetOp())->size;
+	  top_pattrs = ((ProjectLogicalOperator *)before->GetOp())->attrs;
+	  top_size = ((ProjectLogicalOperator *)before->GetOp())->size;
 	  
 	  // Get the select predicate free variables spfv
-	  LEAF_OP * Pred = (LEAF_OP *) (before->GetInput(0)->GetInput(1)->GetOp());
+	  LeafOperator * Pred = (LeafOperator *) (before->GetInput(0)->GetInput(1)->GetOp());
 	  GRP_ID GrpNo = Pred->GetGroup();
 	  EXP_GROUP * PredGrp = Ssp->GetGroup(GrpNo);
 	  LOG_PROP * log_prop = PredGrp->get_log_prop();
@@ -2357,10 +2357,10 @@ EXPR * EQJOIN_LTOR::next_substitute (EXPR * before,PHYS_PROP * ReqdProp)
 	  
 	  // create transformed expression
 	  result =
-		  new EXPR (new PROJECT(CopyArray(top_pattrs, top_size), top_size),
-		  new EXPR (new SELECT,
+		  new EXPR (new ProjectLogicalOperator(CopyArray(top_pattrs, top_size), top_size),
+		  new EXPR (new SelectLogicalOperator,
 		  //new EXPR (before->GetInput(0)->GetOp(),	//select
-		  new EXPR (new PROJECT(pattrs, pattr_size),
+		  new EXPR (new ProjectLogicalOperator(pattrs, pattr_size),
 		  new EXPR((*(before->GetInput(0)->GetInput(0))))		//LEAF(0)
 		  ),
 		  new EXPR((*(before->GetInput(0)->GetInput(1))))			//LEAF(1)
@@ -2377,13 +2377,13 @@ EXPR * EQJOIN_LTOR::next_substitute (EXPR * before,PHYS_PROP * ReqdProp)
 //##ModelId=3B0C086D026A
  DUMMY_TO_PDUMMY::DUMMY_TO_PDUMMY ()
     : RULE ("DUMMY->PDUMMY", 2,
-	    new EXPR (new DUMMY (),
-					  new EXPR (new LEAF_OP (0)),
-					  new EXPR (new LEAF_OP (1))
+	    new EXPR (new DummyLogicalOperator (),
+					  new EXPR (new LeafOperator (0)),
+					  new EXPR (new LeafOperator (1))
 				  ),
-	     new EXPR (new PDUMMY (),
-					  new EXPR (new LEAF_OP (0)),
-					  new EXPR (new LEAF_OP (1))
+	     new EXPR (new DummyPhysicalOperator (),
+					  new EXPR (new LeafOperator (0)),
+					  new EXPR (new LeafOperator (1))
 
 				  )
 		    )
@@ -2396,10 +2396,10 @@ EXPR * EQJOIN_LTOR::next_substitute (EXPR * before,PHYS_PROP * ReqdProp)
 //##ModelId=3B0C086D0273
   EXPR * DUMMY_TO_PDUMMY::next_substitute (EXPR * before,PHYS_PROP * ReqdProp)
   {
-	  DUMMY * Op = (DUMMY *) before->GetOp();
+	  DummyLogicalOperator * Op = (DummyLogicalOperator *) before->GetOp();
 	  
 	  // create transformed expression
-	  EXPR * result = new EXPR (new PDUMMY (),
+	  EXPR * result = new EXPR (new DummyPhysicalOperator (),
 		  new EXPR(*(before->GetInput(0))), 
 		  new EXPR(*(before->GetInput(1)))
 		  );

@@ -117,18 +117,18 @@ class EXPR // An EXPR corresponds to a detailed solution to
 {
 private:
 	//##ModelId=3B0C086E004E
-	OP * Op;	//Operator
+	Operator * Op;	//Operator
 	//##ModelId=3B0C086E0057
 	int 		arity;	//Number of input expressions.
 	//##ModelId=3B0C086E0078
 	EXPR **		Inputs;	//Input expressions
 public:
 	//##ModelId=3B0C086E007F
-	EXPR(OP * Op, EXPR * First = NULL, EXPR * Second = NULL, 
+	EXPR(Operator * Op, EXPR * First = NULL, EXPR * Second = NULL, 
 		EXPR * Third = NULL, EXPR * Fourth = NULL);
 	
 	//##ModelId=3B0C086E00A7
-	EXPR(OP * Op, EXPR ** inputs);	
+	EXPR(Operator * Op, EXPR ** inputs);	
 	
 	//##ModelId=3B0C086E00B1
 	EXPR( EXPR& Expr);
@@ -137,7 +137,7 @@ public:
 	~EXPR();
 	
 	//##ModelId=3B0C086E00BC
-	inline OP * GetOp() {return Op;};
+	inline Operator * GetOp() {return Op;};
 	//##ModelId=3B0C086E00C5
 	inline int GetArity() {return arity;};
 	//##ModelId=3B0C086E00CF

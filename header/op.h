@@ -14,14 +14,14 @@ Columbia Optimizer Framework
 
 #include "stdafx.h"
 
-class OP;	//All operators - Abstract
+class Operator;	//All operators - Abstract
 
 //The next three classes are Abstract - cannot be instantiated
-class LOG_OP;	//Logical Operators on Collections
-class PHYS_OP;	//Physical Operators on Collections
-class ITEM_OP;	//Item Operators on objects, used for predicates
+class LogicalOperator;	//Logical Operators on Collections
+class PhysicalOperator;	//Physical Operators on Collections
+class ItemOperator;	//Item Operators on objects, used for predicates
 
-class LEAF_OP;	//Leaf operators - place holder for a group, in a pattern.
+class LeafOperator;	//Leaf operators - place holder for a group, in a pattern.
 //Patterns are used in rules.
 
 /*
@@ -30,9 +30,9 @@ OPERATORS AND ARGUMENTS - class OP
 ============================================================
 */
 //##ModelId=3B0C087200CB
-class OP
-	//Abstract Class.  Operator and its arguments.  
-	//Arguments could be attributes to project on, etc.
+//Abstract Class.  Operator and its arguments.  
+//Arguments could be attributes to project on, etc.
+class Operator
 {
 public:
 
@@ -42,14 +42,14 @@ public:
 #endif
 
 	//##ModelId=3B0C087200DF
-	OP() {};
+	Operator() {};
 
 	// add assert to the following virtual functions, make sure the subclasses define them
 	//##ModelId=3B0C087200E9
-	virtual OP* Clone() = 0;
+	virtual Operator* Clone() = 0;
 
 	//##ModelId=3B0C087200F3
-	virtual ~OP() {};
+	virtual ~Operator() {};
 
 	//##ModelId=3B0C087200F5
 	virtual CString Dump() = 0;
@@ -67,7 +67,7 @@ public:
 	virtual int GetArity() = 0;
 
 	//##ModelId=3B0C0872011C
-	virtual bool operator==(OP* other) { return (GetNameId() == other->GetNameId()); };
+	virtual bool operator==(Operator* other) { return (GetNameId() == other->GetNameId()); };
 
 	//Used to compute the hash value of an mexpr.  Used only for logical operators, 
 	//so we make it abort everywhere else.
@@ -100,15 +100,15 @@ public:
 
 
 //##ModelId=3B0C0872017F
-class LOG_OP : public OP //Logical Operator Abstract Class
-
+//Logical Operator Abstract Class
+class LogicalOperator : public Operator
 {
 
 public:
 	//##ModelId=3B0C08720193
-	LOG_OP() {};
+	LogicalOperator() {};
 	//##ModelId=3B0C08720194
-	virtual ~LOG_OP() {};
+	virtual ~LogicalOperator() {};
 
 	//OpMatch (other) is true if this and other are the same operator,
 	//independent of arguments.
@@ -117,13 +117,13 @@ public:
 	//other than logical operators.
 	//If someone writes a rule which uses member data, it could be made virtual
 	//##ModelId=3B0C0872019E
-	inline bool 	OpMatch(LOG_OP* other)
+	inline bool 	OpMatch(LogicalOperator* other)
 	{
 		return (GetNameId() == other->GetNameId());
 	};
 
 	//##ModelId=3B0C087201A8
-	inline bool	is_logical() { return true; };
+	inline bool	is_logical() override { return true; };
 
 	//##ModelId=3B0C087201A9
 	inline ub4 GetInitval() { return(lookup2(GetNameId(), 0)); };
@@ -148,16 +148,15 @@ public:
 */
 
 //##ModelId=3B0C087201F8
-class PHYS_OP : public OP	//Physical Operator
+//Physical Operator
+class PhysicalOperator : public Operator
 
 {
-
 public:
-
 	//##ModelId=3B0C0872020D
-	PHYS_OP() {};
+	PhysicalOperator() {};
 	//##ModelId=3B0C0872020E
-	virtual ~PHYS_OP() {};
+	virtual ~PhysicalOperator() {};
 
 	//FindPhysProp() establishes the physical properties of an 
 	//algorithm's output.	
@@ -214,14 +213,14 @@ public:
 */
 
 //##ModelId=3B0C0872028E
-class ITEM_OP : public OP   //Item Operator - both logical and physical
+class ItemOperator : public Operator   //Item Operator - both logical and physical
 //Can we do multiple inheritance?  That would be ideal.
 {
 public:
 	//##ModelId=3B0C08720299
-	ITEM_OP() {};
+	ItemOperator() {};
 	//##ModelId=3B0C087202A2
-	~ITEM_OP() {};
+	~ItemOperator() {};
 
 	//For now we assume no expensive predicates
 	//##ModelId=3B0C087202A3
@@ -257,7 +256,7 @@ public:
 */
 
 //##ModelId=3B0C08720374
-class LEAF_OP : public OP
+class LeafOperator : public Operator
 	//Used in rules only.  Placeholder for a Group
 {
 private:
@@ -271,7 +270,7 @@ private:
 public:
 
 	//##ModelId=3B0C087203BA
-	LEAF_OP(GRP_ID index, GRP_ID group = -1)
+	LeafOperator(GRP_ID index, GRP_ID group = -1)
 		: Index(index), Group(group)
 	{
 		if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_LEAF_OP].New();
@@ -281,7 +280,7 @@ public:
 	};
 
 	//##ModelId=3B0C087203C5
-	LEAF_OP(LEAF_OP& Op)
+	LeafOperator(LeafOperator& Op)
 		:Index(Op.Index), Group(Op.Group)
 	{
 		if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_LEAF_OP].New();
@@ -291,10 +290,10 @@ public:
 	};
 
 	//##ModelId=3B0C087203CF
-	inline OP* Clone() { return new LEAF_OP(*this); };
+	inline Operator* Clone() { return new LeafOperator(*this); };
 
 	//##ModelId=3B0C087203D8
-	~LEAF_OP()
+	~LeafOperator()
 	{
 		if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_LEAF_OP].Delete();
 	};
